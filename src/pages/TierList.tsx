@@ -29,27 +29,29 @@ interface TierListProps {
 	initialImages: Image[];
 }
 
-const tiers: {
-	tier: string;
-	tierColor: string;
-	key: number;
-}[] = [
-	{ key: 1, tier: "S", tierColor: "bg-green-600" },
-	{ key: 2, tier: "A", tierColor: "bg-yellow-300" },
-	{ key: 3, tier: "B", tierColor: "bg-yellow-500" },
-	{ key: 4, tier: "C", tierColor: "bg-blue-400" },
-	{ key: 6, tier: "D", tierColor: "bg-red-600" },
+interface Tier {
+	id: string;
+	name: string;
+	color: string;
+}
+
+const initialTiers: Tier[] = [
+	{ id: "S", name: "S", color: "bg-green-600" },
+	{ id: "A", name: "A", color: "bg-yellow-300" },
+	{ id: "B", name: "B", color: "bg-yellow-500" },
+	{ id: "C", name: "C", color: "bg-blue-400" },
+	{ id: "D", name: "D", color: "bg-red-600" },
 ];
 
 export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
+	const [title, setTitle] = useState<string>("Draggable Image Tier List");
+	const [tiers, setTiers] = useState<Tier[]>(initialTiers);
 	const [items, setItems] = useState<Image[]>(initialImages);
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [tierState, setTierState] = useState<Record<string, string[]>>(() => {
-		const initial: Record<string, string[]> = {
-			start: [],
-		};
+		const initial: Record<string, string[]> = { start: [] };
 		tiers.forEach(tier => {
-			initial[tier.tier] = [];
+			initial[tier.id] = [];
 		});
 		initialImages.forEach(img => {
 			if (initial[img.tier]) {
@@ -61,28 +63,19 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 		return initial;
 	});
 
-	const [images] = useState<Record<string, Image>>(() => {
-		return initialImages.reduce((acc, img) => {
+	const [images] = useState<Record<string, Image>>(() =>
+		initialImages.reduce((acc, img) => {
 			acc[img.id] = img;
 			return acc;
-		}, {} as Record<string, Image>);
-	});
+		}, {} as Record<string, Image>)
+	);
 
 	const sensors = useSensors(
-		// useSensor(PointerSensor),
-		// useSensor(KeyboardSensor, {
-		// 	coordinateGetter: sortableKeyboardCoordinates,
-		// }),
 		useSensor(TouchSensor, {
-			activationConstraint: {
-				delay: 250,
-				tolerance: 5,
-			},
+			activationConstraint: { delay: 250, tolerance: 5 },
 		}),
 		useSensor(MouseSensor, {
-			activationConstraint: {
-				distance: 10,
-			},
+			activationConstraint: { distance: 10 },
 		})
 	);
 
@@ -130,8 +123,7 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 	};
 
 	const handleDragStart = (event: DragStartEvent) => {
-		const { active } = event;
-		setActiveId(active.id as string);
+		setActiveId(event.active.id as string);
 	};
 
 	const handleDragOver = (event: DragOverEvent) => {
@@ -154,6 +146,43 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 		}
 	};
 
+	const handleTierNameChange = (tierId: string, newName: string) => {
+		setTiers(prev =>
+			prev.map(tier => (tier.id === tierId ? { ...tier, name: newName } : tier))
+		);
+		console.log(tiers, "tierState");
+	};
+
+	const addTier = () => {
+		if (tiers.length >= 9) return;
+		const newId = `Tier${tiers.length + 1}`;
+		const newTier: Tier = {
+			id: newId,
+			name: newId,
+			color: "bg-gray-400",
+		};
+		console.log(newId, "id");
+		setTiers(prev => [...prev, newTier]);
+		setTierState(prev => ({ ...prev, [newId]: [] }));
+	};
+
+	const removeTier = (tierId: string) => {
+		if (tiers.length <= 2) return;
+		setTiers(prev => prev.filter(tier => tier.id !== tierId));
+		setTierState(prev => {
+			const { [tierId]: removed, ...rest } = prev;
+			return rest;
+		});
+	};
+
+	const changeTierColor = (tierId: string, newColor: string) => {
+		setTiers(prev =>
+			prev.map(tier =>
+				tier.id === tierId ? { ...tier, color: newColor } : tier
+			)
+		);
+	};
+
 	return (
 		<DndContext
 			sensors={sensors}
@@ -166,23 +195,41 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 				strategy={rectSortingStrategy}
 			>
 				<div className='max-w-4xl mx-auto'>
+					<input
+						type='text'
+						value={title}
+						onChange={e => setTitle(e.target.value)}
+						className='text-3xl font-bold text-center my-8 w-full bg-transparent border-none'
+					/>
 					{tiers.map(tier => (
 						<TierRow
-							key={tier.key}
-							tier={tier.tier}
-							imageIds={tierState[tier.tier]}
+							key={tier.id}
+							tier={tier.name}
+							imageIds={tierState[tier.id] || []}
 							images={images}
-							tierColor={tier.tierColor}
+							tierColor={tier.color}
+							changeTierColor={newColor => changeTierColor(tier.id, newColor)}
+							onTierNameChange={newName =>
+								handleTierNameChange(tier.id, newName)
+							}
+							onRemoveTier={() => removeTier(tier.id)}
 						/>
 					))}
 					<InitRow tier='start' imageIds={tierState["start"]} images={images} />
+					<div className='flex justify-center mt-4'>
+						<button
+							onClick={addTier}
+							className='px-4 py-2 bg-blue-500 text-white rounded'
+							disabled={tiers.length >= 9}
+						>
+							Add Tier
+						</button>
+					</div>
 				</div>
 				<DragOverlay>
-					{activeId ? (
-						<DraggableImage
-							image={items.find(item => item.id === activeId) || items[0]}
-						/>
-					) : null}
+					{activeId && images[activeId] && (
+						<DraggableImage image={images[activeId]} />
+					)}
 				</DragOverlay>
 			</SortableContext>
 		</DndContext>

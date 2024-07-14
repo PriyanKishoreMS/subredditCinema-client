@@ -33,9 +33,6 @@ function HomeLander() {
 	return (
 		<>
 			<div className='App p-4'>
-				<h1 className='text-3xl font-bold text-center my-8'>
-					Draggable Image Tier List
-				</h1>
 				<TierList initialImages={initialImages} />
 			</div>
 		</>
