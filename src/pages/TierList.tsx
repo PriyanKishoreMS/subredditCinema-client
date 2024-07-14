@@ -44,7 +44,7 @@ const initialTiers: Tier[] = [
 ];
 
 export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
-	const [title, setTitle] = useState<string>("Draggable Image Tier List");
+	const [title, setTitle] = useState<string>("Bollytics Tier List");
 	const [tiers, setTiers] = useState<Tier[]>(initialTiers);
 	const [items, setItems] = useState<Image[]>(initialImages);
 	const [activeId, setActiveId] = useState<string | null>(null);
@@ -218,7 +218,7 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 				items={Object.values(tierState).flat()}
 				strategy={rectSortingStrategy}
 			>
-				<div className='max-w-4xl mx-auto'>
+				<div className='max-w-4xl w-full mx-auto'>
 					<input
 						type='text'
 						value={title}

@@ -1,4 +1,7 @@
 // src/App.tsx
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import Search from "./Search";
 import { Image, TierList } from "./TierList";
 
 const initialImages: Image[] = [
@@ -29,13 +32,68 @@ const initialImages: Image[] = [
 	},
 ];
 
+const ipAddrPort = "http://localhost:3000";
+
+const fetchTierImages = async (
+	type: "actors" | "movies",
+	name: string,
+	page: number
+) => {
+	try {
+		const response = await fetch(`${ipAddrPort}/${type}/${name}?page=${page}`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		const res = await response.json();
+		return res;
+	} catch (error) {
+		console.error(error, "error here");
+	}
+};
+
 function HomeLander() {
+	const [tierImageQuery, setTierImageQuery] = useState<{
+		type: "actors" | "movies";
+		name: string;
+		page: number;
+	}>({
+		type: "actors",
+		name: "",
+		page: 1,
+	});
+
+	const { data: tierImages, refetch } = useQuery({
+		queryKey: ["tierImages", tierImageQuery],
+		queryFn: async () => {
+			const res = await fetchTierImages(
+				tierImageQuery.type,
+				tierImageQuery.name,
+				tierImageQuery.page
+			);
+			return res;
+		},
+		enabled: !!tierImageQuery.name,
+	});
+
+	const handleSearch = () => {
+		refetch();
+	};
+
 	return (
-		<>
-			<div className='App p-4'>
-				<TierList initialImages={initialImages} />
+		<div className='min-h-screen bg-gray-900 text-white'>
+			<div className='container mx-auto p-8'>
+				<div className='flex gap-8'>
+					<TierList initialImages={initialImages} />
+					<Search
+						tierImages={tierImages}
+						setTierImageQuery={setTierImageQuery}
+						onSearch={handleSearch}
+					/>
+				</div>
 			</div>
-		</>
+		</div>
 	);
 }
 
