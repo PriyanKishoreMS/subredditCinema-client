@@ -1,3 +1,4 @@
+import { NextUIProvider } from "@nextui-org/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import HomeLander from "./pages/HomeLandler";
 
@@ -6,7 +7,9 @@ function App() {
 	return (
 		<>
 			<QueryClientProvider client={queryClient}>
-				<HomeLander />
+				<NextUIProvider>
+					<HomeLander />
+				</NextUIProvider>
 			</QueryClientProvider>
 		</>
 	);

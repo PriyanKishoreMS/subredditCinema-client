@@ -1,6 +1,9 @@
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
+import { Button } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
+import { FaDeleteLeft } from "react-icons/fa6";
+import { HiOutlineColorSwatch } from "react-icons/hi";
 import { DraggableImage } from "./DraggableImage";
 import { Image } from "./TierList";
 
@@ -63,7 +66,7 @@ export const TierRow: React.FC<TierRowProps> = ({
 	};
 
 	return (
-		<div className='flex mb-4 items-center'>
+		<div className='flex mb-4 items-center justify-center'>
 			<input
 				type='text'
 				value={localTierName}
@@ -81,24 +84,38 @@ export const TierRow: React.FC<TierRowProps> = ({
 					))}
 				</SortableContext>
 			</div>
-			<button onClick={() => onRemoveTier(tier.id)} className='ml-2'>
-				X
+			<button
+				onClick={() => onRemoveTier(tier.id)}
+				className='mx-2 ml-5 text-center rounded-full  bg-opacity-50 '
+			>
+				<FaDeleteLeft className='text-white text-xl text-center' />
 			</button>
-			<div className='relative'>
+			<div className='relative flex'>
 				<button onClick={() => setShowColorPicker(!showColorPicker)}>
-					<div className={`w-5 h-5 ${tier.color}`}></div>
+					<HiOutlineColorSwatch
+						className={`text-white ml-2 rounded-full p-1.5 ${tier.color} text-4xl`}
+					/>
 				</button>
 				{showColorPicker && (
-					<div className='absolute right-0 mt-2 p-2 z-10 bg-white border rounded shadow-lg'>
-						<div className='grid grid-cols-3 gap-10'>
+					<div className='absolute right-0 mt-2 p-4 w-40 z-10 bg-white bg-opacity-50 backdrop-blur-xl border rounded shadow-lg'>
+						<div className='grid grid-cols-3 gap-2 mb-2'>
 							{colors.map((color, index) => (
 								<button
 									key={index}
-									className={`w-6 h-6 ${color}`}
+									className={`w-8 h-8 ${color} rounded-full`}
 									onClick={() => handleColorChange(color)}
 								></button>
 							))}
 						</div>
+						<Button
+							size='md'
+							variant='flat'
+							radius='sm'
+							className='w-full mt-2 py-1 bg-gray-200 text-gray-700'
+							onClick={() => setShowColorPicker(false)}
+						>
+							Close
+						</Button>
 					</div>
 				)}
 			</div>

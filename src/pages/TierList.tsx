@@ -14,7 +14,11 @@ import {
 	rectSortingStrategy,
 	SortableContext,
 } from "@dnd-kit/sortable";
-import React, { useState } from "react";
+import { Button } from "@nextui-org/react";
+import React, { useEffect, useState } from "react";
+import { RiPlayListAddFill } from "react-icons/ri";
+
+import { v4 as uuidv4 } from "uuid";
 import { DraggableImage } from "./DraggableImage";
 import { InitRow } from "./InitRow";
 import { TierRow } from "./TierRow";
@@ -46,29 +50,49 @@ const initialTiers: Tier[] = [
 export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 	const [title, setTitle] = useState<string>("Bollytics Tier List");
 	const [tiers, setTiers] = useState<Tier[]>(initialTiers);
-	const [items, setItems] = useState<Image[]>(initialImages);
+	const [items, setItems] = useState<Image[]>([]);
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [tierState, setTierState] = useState<Record<string, string[]>>(() => {
 		const initial: Record<string, string[]> = { start: [] };
 		tiers.forEach(tier => {
 			initial[tier.id] = [];
 		});
-		initialImages.forEach(img => {
-			if (initial[img.tier]) {
-				initial[img.tier].push(img.id);
-			} else {
-				initial.start.push(img.id);
-			}
-		});
 		return initial;
 	});
 
-	const [images] = useState<Record<string, Image>>(() =>
-		initialImages.reduce((acc, img) => {
+	const [images, setImages] = useState<Record<string, Image>>({});
+
+	// const [images] = useState<Record<string, Image>>(() =>
+	// 	initialImages.reduce((acc, img) => {
+	// 		acc[img.id] = img;
+	// 		return acc;
+	// 	}, {} as Record<string, Image>)
+	// );
+
+	useEffect(() => {
+		const newImages = initialImages.reduce((acc, img) => {
 			acc[img.id] = img;
 			return acc;
-		}, {} as Record<string, Image>)
-	);
+		}, {} as Record<string, Image>);
+
+		setImages(prevImages => ({ ...prevImages, ...newImages }));
+
+		setItems(prevItems => {
+			const existingIds = new Set(prevItems.map(item => item.id));
+			const newItems = initialImages.filter(img => !existingIds.has(img.id));
+			return [...prevItems, ...newItems];
+		});
+
+		setTierState(prev => {
+			const newState = { ...prev };
+			initialImages.forEach(img => {
+				if (!Object.values(newState).flat().includes(img.id)) {
+					newState.start.push(img.id);
+				}
+			});
+			return newState;
+		});
+	}, [initialImages]);
 
 	const sensors = useSensors(
 		useSensor(TouchSensor, {
@@ -148,25 +172,15 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 
 	const handleTierNameChange = (tierId: string, newName: string) => {
 		setTiers(prev =>
-			prev.map(tier =>
-				tier.id === tierId ? { ...tier, name: newName, id: newName } : tier
-			)
+			prev.map(tier => (tier.id === tierId ? { ...tier, name: newName } : tier))
 		);
-		setTierState(prev => {
-			const newState = { ...prev };
-			if (tierId in newState) {
-				newState[newName] = newState[tierId];
-				delete newState[tierId];
-			}
-			return newState;
-		});
 	};
 
 	const addTier = () => {
 		if (tiers.length >= 9) return;
 		const newId = `Tier${tiers.length + 1}`;
 		const newTier: Tier = {
-			id: newId,
+			id: uuidv4(),
 			name: newId,
 			color: "bg-gray-400",
 		};
@@ -240,13 +254,18 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 					))}
 					<InitRow tier='start' imageIds={tierState["start"]} images={images} />
 					<div className='flex justify-center mt-4'>
-						<button
+						<Button
+							size='md'
+							variant='shadow'
+							color='primary'
+							radius='sm'
 							onClick={addTier}
-							className='px-4 py-2 bg-blue-500 text-white rounded'
+							className='px-8 py-2  text-white text font-bold'
 							disabled={tiers.length >= 9}
+							startContent={<RiPlayListAddFill className='text-lg' />}
 						>
 							Add Tier
-						</button>
+						</Button>
 					</div>
 				</div>
 				<DragOverlay>

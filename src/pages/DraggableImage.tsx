@@ -1,10 +1,11 @@
+// DraggableImage.tsx
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import React from "react";
 import { Image } from "./TierList";
 
 interface DraggableImageProps {
-	image: Image;
+	image: Image | undefined;
 }
 
 export const DraggableImage: React.FC<DraggableImageProps> = ({ image }) => {
@@ -15,13 +16,17 @@ export const DraggableImage: React.FC<DraggableImageProps> = ({ image }) => {
 		transform,
 		transition,
 		isDragging,
-	} = useSortable({ id: image.id });
+	} = useSortable({ id: image?.id || "" });
 
 	const style = {
 		transform: CSS.Transform.toString(transform),
 		transition,
 		opacity: isDragging ? 0.5 : 1,
 	};
+
+	if (!image) {
+		return null; // or return a placeholder image
+	}
 
 	return (
 		<img

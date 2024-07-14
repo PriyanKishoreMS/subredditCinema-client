@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 
 type SearchProps = {
-	tierImages: any;
+	searchResults: any;
+
 	setTierImageQuery: React.Dispatch<
 		React.SetStateAction<{
 			type: "actors" | "movies";
@@ -10,12 +11,14 @@ type SearchProps = {
 		}>
 	>;
 	onSearch: () => void;
+	onAddImage: (image: any) => void;
 };
 
 const Search: React.FC<SearchProps> = ({
-	tierImages,
+	searchResults,
 	setTierImageQuery,
 	onSearch,
+	onAddImage,
 }) => {
 	const [searchType, setSearchType] = useState<"actors" | "movies">("actors");
 	const [searchTerm, setSearchTerm] = useState("");
@@ -31,7 +34,7 @@ const Search: React.FC<SearchProps> = ({
 	};
 
 	return (
-		<div className='w-64 bg-gray-800 p-4 flex flex-col h-[750px] rounded-lg shadow-lg'>
+		<div className='lg:w-64 w-full bg-gray-800 p-4 flex flex-col h-[750px] rounded-lg shadow-lg'>
 			<div className='mb-4'>
 				<div className='flex justify-center gap-4 mb-4'>
 					<label className='inline-flex items-center'>
@@ -61,6 +64,7 @@ const Search: React.FC<SearchProps> = ({
 					<input
 						className='w-full bg-gray-700 text-white border border-gray-600 rounded-t-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500'
 						type='text'
+						// color='primary'
 						placeholder={`Search ${
 							searchType === "actors" ? "actor" : "movie"
 						}`}
@@ -76,12 +80,13 @@ const Search: React.FC<SearchProps> = ({
 				</div>
 			</div>
 			<div className='overflow-y-auto flex-grow pr-2'>
-				{tierImages && (
+				{searchResults && (
 					<div className='grid grid-cols-2 gap-2'>
-						{tierImages.map((image: any) => (
+						{searchResults.map((image: any) => (
 							<div
 								key={image.id}
-								className='bg-gray-700 rounded-lg overflow-hidden'
+								className='bg-gray-700 rounded-lg overflow-hidden cursor-pointer'
+								onClick={() => onAddImage(image)}
 							>
 								<img
 									src={image.image}

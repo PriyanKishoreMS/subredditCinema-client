@@ -17,15 +17,18 @@ export const InitRow: React.FC<InitRowProps> = ({ tier, imageIds, images }) => {
 
 	return (
 		<div className='flex items-center mb-4'>
-			<div className='w-12 h-12 flex items-center justify-center font-bold text-xl'></div>
 			<div
 				ref={setNodeRef}
-				className='flex-1 border-dashed rounded-lg bg-gray-300 bg-opacity-30 border flex items-center space-x-2 p-2 min-h-[5rem]'
+				className='flex-grow grid grid-cols-10 gap-2 border-2 border-dashed border-gray-600 rounded-lg bg-gray-800 p-4 min-h-[6rem] transition-all duration-300 hover:bg-gray-700'
 			>
 				<SortableContext items={imageIds} strategy={rectSortingStrategy}>
-					{imageIds.map(id => (
-						<DraggableImage key={id} image={images[id]} />
-					))}
+					{imageIds.length > 0 ? (
+						imageIds.map(id => <DraggableImage key={id} image={images[id]} />)
+					) : (
+						<div className='col-span-10 flex items-center justify-center text-gray-500 italic'>
+							Search and click on items here to start
+						</div>
+					)}
 				</SortableContext>
 			</div>
 		</div>
