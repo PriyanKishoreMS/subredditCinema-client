@@ -29,7 +29,7 @@ interface TierListProps {
 	initialImages: Image[];
 }
 
-interface Tier {
+export interface Tier {
 	id: string;
 	name: string;
 	color: string;
@@ -148,9 +148,18 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 
 	const handleTierNameChange = (tierId: string, newName: string) => {
 		setTiers(prev =>
-			prev.map(tier => (tier.id === tierId ? { ...tier, name: newName } : tier))
+			prev.map(tier =>
+				tier.id === tierId ? { ...tier, name: newName, id: newName } : tier
+			)
 		);
-		console.log(tiers, "tierState");
+		setTierState(prev => {
+			const newState = { ...prev };
+			if (tierId in newState) {
+				newState[newName] = newState[tierId];
+				delete newState[tierId];
+			}
+			return newState;
+		});
 	};
 
 	const addTier = () => {
@@ -168,10 +177,25 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 
 	const removeTier = (tierId: string) => {
 		if (tiers.length <= 2) return;
+
 		setTiers(prev => prev.filter(tier => tier.id !== tierId));
+
 		setTierState(prev => {
-			const { [tierId]: removed, ...rest } = prev;
-			return rest;
+			const newState = { ...prev };
+			const removedTierImages = newState[tierId] || [];
+			delete newState[tierId];
+
+			newState.start = [...newState.start, ...removedTierImages];
+
+			setItems(prevItems =>
+				prevItems.map(item =>
+					removedTierImages.includes(item.id)
+						? { ...item, tier: "start" }
+						: item
+				)
+			);
+
+			return newState;
 		});
 	};
 
@@ -204,15 +228,14 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 					{tiers.map(tier => (
 						<TierRow
 							key={tier.id}
-							tier={tier.name}
+							tier={tier}
 							imageIds={tierState[tier.id] || []}
 							images={images}
-							tierColor={tier.color}
 							changeTierColor={newColor => changeTierColor(tier.id, newColor)}
-							onTierNameChange={newName =>
-								handleTierNameChange(tier.id, newName)
+							onTierNameChange={(oldId, newName) =>
+								handleTierNameChange(oldId, newName)
 							}
-							onRemoveTier={() => removeTier(tier.id)}
+							onRemoveTier={tierId => removeTier(tierId)}
 						/>
 					))}
 					<InitRow tier='start' imageIds={tierState["start"]} images={images} />
