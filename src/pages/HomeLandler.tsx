@@ -12,12 +12,15 @@ const fetchTierImages = async (
 	page: number
 ) => {
 	try {
-		const response = await fetch(`${ipAddrPort}/${type}/${name}?page=${page}`, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		});
+		const response = await fetch(
+			`${ipAddrPort}/api/${type}/${name}?page=${page}`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			}
+		);
 		const res = await response.json();
 		return res;
 	} catch (error) {
@@ -60,6 +63,7 @@ function HomeLander() {
 			id: image.id,
 			src: image.image,
 			tier: "start",
+			name: image.name,
 		};
 		setTierImages(prev => {
 			const isExisting = prev.some(img => img.src === newImage.src);

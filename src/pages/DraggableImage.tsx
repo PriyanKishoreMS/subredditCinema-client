@@ -29,14 +29,17 @@ export const DraggableImage: React.FC<DraggableImageProps> = ({ image }) => {
 	}
 
 	return (
-		<img
-			ref={setNodeRef}
-			style={style}
-			{...listeners}
-			{...attributes}
-			src={image.src}
-			alt={`Tier ${image.tier} image`}
-			className='w-16 h-16 rounded-lg object-cover cursor-move'
-		/>
+		<div>
+			<img
+				ref={setNodeRef}
+				style={style}
+				{...listeners}
+				{...attributes}
+				src={image.src}
+				alt={`Tier ${image.tier} image`}
+				className='w-16 h-16 rounded-lg object-cover cursor-move'
+			/>
+			{/* <p className=''>{image.name}</p> */}
+		</div>
 	);
 };

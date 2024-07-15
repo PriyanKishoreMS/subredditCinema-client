@@ -26,6 +26,7 @@ import { TierRow } from "./TierRow";
 export interface Image {
 	id: string;
 	src: string;
+	name: string;
 	tier: string;
 }
 
@@ -232,7 +233,7 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 				items={Object.values(tierState).flat()}
 				strategy={rectSortingStrategy}
 			>
-				<div className='max-w-4xl w-full mx-auto'>
+				<div className='max-w-6xl w-full mx-auto'>
 					<input
 						type='text'
 						value={title}

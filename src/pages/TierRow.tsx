@@ -67,13 +67,16 @@ export const TierRow: React.FC<TierRowProps> = ({
 
 	return (
 		<div className='flex mb-4 items-center justify-center'>
-			<input
-				type='text'
-				value={localTierName}
-				onChange={handleInputChange}
-				onBlur={handleInputBlur}
-				className='w-12 h-12 flex items-center justify-center font-bold text-xl bg-transparent border-none'
-			/>
+			<div className='flex-shrink-0 lg:w-32 w-10 mr-2'>
+				<input
+					type='text'
+					value={localTierName}
+					onChange={handleInputChange}
+					onBlur={handleInputBlur}
+					className='w-full h-12 flex items-center justify-end font-bold text-xl bg-transparent border-none text-right pr-2'
+					style={{ minWidth: "24px" }}
+				/>
+			</div>
 			<div
 				ref={setNodeRef}
 				className={`flex-1 bg-opacity-70 rounded-lg flex items-center space-x-2 p-2 min-h-[5rem] ${tier.color}`}
