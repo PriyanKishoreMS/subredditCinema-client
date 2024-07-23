@@ -1,10 +1,15 @@
 // src/App.tsx
 import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import Search from "./Search";
-import { Image, TierList } from "./TierList";
+import Search from "../components/tiermaker/Search";
+import { Image, TierList } from "../components/tiermaker/TierList";
 
 const ipAddrPort = "http://localhost:3000";
+
+export const Route = createFileRoute("/tiermaker")({
+	component: TierMaker,
+});
 
 const fetchTierImages = async (
 	type: "actors" | "movies",
@@ -13,7 +18,7 @@ const fetchTierImages = async (
 ) => {
 	try {
 		const response = await fetch(
-			`${ipAddrPort}/api/${type}/${name}?page=${page}`,
+			`${ipAddrPort}/api/tmdb/${type}/${name}?page=${page}`,
 			{
 				method: "GET",
 				headers: {
@@ -28,7 +33,7 @@ const fetchTierImages = async (
 	}
 };
 
-function HomeLander() {
+function TierMaker() {
 	const [tierImageQuery, setTierImageQuery] = useState<{
 		type: "actors" | "movies";
 		name: string;
@@ -73,7 +78,7 @@ function HomeLander() {
 	};
 
 	return (
-		<div className='min-h-screen bg-gray-900 text-white'>
+		<div className='min-h-screen  text-white'>
 			<div className='container mx-auto p-4 sm:p-8'>
 				<div className='flex flex-col lg:flex-row gap-8'>
 					<div className='w-full'>
@@ -92,5 +97,3 @@ function HomeLander() {
 		</div>
 	);
 }
-
-export default HomeLander;

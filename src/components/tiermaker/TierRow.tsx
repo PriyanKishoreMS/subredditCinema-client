@@ -1,6 +1,5 @@
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
-import { Button } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { FaDeleteLeft } from "react-icons/fa6";
 import { HiOutlineColorSwatch } from "react-icons/hi";
@@ -66,20 +65,23 @@ export const TierRow: React.FC<TierRowProps> = ({
 	};
 
 	return (
-		<div className='flex mb-4 items-center justify-center'>
-			<div className='flex-shrink-0 lg:w-32 w-10 mr-2'>
-				<input
-					type='text'
-					value={localTierName}
-					onChange={handleInputChange}
+		<div className='flex mb-2 items-center justify-center'>
+			<div
+				className={`flex-shrink-0 lg:w-20 h-20 w-10 mr-2 rounded-md ${tier.color} relative`}
+			>
+				<div
+					contentEditable
+					suppressContentEditableWarning
+					onInput={handleInputChange}
 					onBlur={handleInputBlur}
-					className='w-full h-12 flex items-center justify-end font-bold text-xl bg-transparent border-none text-right pr-2'
-					style={{ minWidth: "24px" }}
-				/>
+					className='w-full h-20 flex items-center justify-center font-black text-xl bg-transparent text-black border-none text-center overflow-hidden p-2 break-all whitespace-pre-wrap'
+				>
+					{localTierName}
+				</div>
 			</div>
 			<div
 				ref={setNodeRef}
-				className={`flex-1 bg-opacity-70 rounded-lg flex items-center space-x-2 p-2 min-h-[5rem] ${tier.color}`}
+				className={`flex-1 bg-opacity-50 rounded-md flex items-center space-x-2 p-2 min-h-[5rem] backdrop-blur-md bg-gray-600 border border-gray-400`}
 			>
 				<SortableContext items={imageIds} strategy={rectSortingStrategy}>
 					{imageIds.map(id => (
@@ -110,18 +112,17 @@ export const TierRow: React.FC<TierRowProps> = ({
 								></button>
 							))}
 						</div>
-						<Button
-							size='md'
-							variant='flat'
-							radius='sm'
-							className='w-full mt-2 py-1 bg-gray-200 text-gray-700'
+						<button
+							className='w-full mt-2 py-1 bg-gray-200 text-gray-700 rounded'
 							onClick={() => setShowColorPicker(false)}
 						>
 							Close
-						</Button>
+						</button>
 					</div>
 				)}
 			</div>
 		</div>
 	);
 };
+
+<style></style>;

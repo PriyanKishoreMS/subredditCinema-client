@@ -14,9 +14,7 @@ import {
 	rectSortingStrategy,
 	SortableContext,
 } from "@dnd-kit/sortable";
-import { Button } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
-import { RiPlayListAddFill } from "react-icons/ri";
 
 import { v4 as uuidv4 } from "uuid";
 import { DraggableImage } from "./DraggableImage";
@@ -71,10 +69,13 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 	// );
 
 	useEffect(() => {
-		const newImages = initialImages.reduce((acc, img) => {
-			acc[img.id] = img;
-			return acc;
-		}, {} as Record<string, Image>);
+		const newImages = initialImages.reduce(
+			(acc, img) => {
+				acc[img.id] = img;
+				return acc;
+			},
+			{} as Record<string, Image>
+		);
 
 		setImages(prevImages => ({ ...prevImages, ...newImages }));
 
@@ -233,7 +234,7 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 				items={Object.values(tierState).flat()}
 				strategy={rectSortingStrategy}
 			>
-				<div className='max-w-6xl w-full mx-auto'>
+				<div className='max-w-4xl w-full mx-auto'>
 					<input
 						type='text'
 						value={title}
@@ -255,18 +256,13 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 					))}
 					<InitRow tier='start' imageIds={tierState["start"]} images={images} />
 					<div className='flex justify-center mt-4'>
-						<Button
-							size='md'
-							variant='shadow'
-							color='primary'
-							radius='sm'
+						<button
 							onClick={addTier}
-							className='px-8 py-2  text-white text font-bold'
+							className='px-8 py-2  text-white text font-bold bg-blue-600 rounded-md shadow-lg shadow-blue-900 disabled:opacity-50'
 							disabled={tiers.length >= 9}
-							startContent={<RiPlayListAddFill className='text-lg' />}
 						>
 							Add Tier
-						</Button>
+						</button>
 					</div>
 				</div>
 				<DragOverlay>
