@@ -74,7 +74,7 @@ export const TierRow: React.FC<TierRowProps> = ({
 					suppressContentEditableWarning
 					onInput={handleInputChange}
 					onBlur={handleInputBlur}
-					className='w-full h-20 flex items-center justify-center font-black text-xl bg-transparent text-black border-none text-center overflow-hidden p-2 break-all whitespace-pre-wrap'
+					className='w-full h-20 flex items-center justify-center font-medium text-l bg-transparent text-black border-none text-center overflow-hidden p-2 break-all whitespace-pre-wrap'
 				>
 					{localTierName}
 				</div>

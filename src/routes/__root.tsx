@@ -4,7 +4,7 @@ import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 export const Route = createRootRoute({
 	component: () => (
 		<>
-			<div className=' bg-[url("/public/twbg2.jpg")]'>
+			<div className='dark bg-[url("/twbg2.jpg")]'>
 				<Outlet />
 				<TanStackRouterDevtools />
 			</div>
