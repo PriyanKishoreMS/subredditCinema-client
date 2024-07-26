@@ -90,6 +90,7 @@ function TierMaker() {
 							setTierImageQuery={setTierImageQuery}
 							onSearch={handleSearch}
 							onAddImage={handleAddImage}
+							tierImageQuery={tierImageQuery}
 						/>
 					</div>
 				</div>

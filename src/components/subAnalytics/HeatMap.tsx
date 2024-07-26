@@ -4,9 +4,8 @@ import {
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
 import { FaRedditAlien } from "react-icons/fa";
 import { TbEggFilled } from "react-icons/tb";
 
@@ -37,13 +36,13 @@ const fetchPostFrequency = async (category: string) => {
 
 const weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-const Heatmap = () => {
-	const [category, setCategory] = React.useState("kollywood");
-
+const Heatmap: React.FC<{
+	sub: string;
+}> = ({ sub }) => {
 	const { data, isLoading, isError } = useQuery({
-		queryKey: ["frequency", category],
-		queryFn: () => fetchPostFrequency(category),
-		enabled: !!category,
+		queryKey: ["frequency", sub],
+		queryFn: () => fetchPostFrequency(sub),
+		enabled: !!sub,
 	});
 
 	const getColor = (value: number) => {
@@ -64,7 +63,16 @@ const Heatmap = () => {
 
 	const renderHeatmap = (frequencyData: FrequencyData | undefined) => {
 		if (!frequencyData) {
-			return <div>No data available</div>;
+			return (
+				<div className='flex items-center space-x-6'>
+					<Skeleton className='h-12 w-12 rounded-full' />
+					<div className='space-y-2'>
+						<h1>Loading</h1>
+						<Skeleton className='h-4 lg:w-[450px]' />
+						<Skeleton className='h-4 lg:w-[840px]' />
+					</div>
+				</div>
+			);
 		}
 
 		const days = Object.keys(frequencyData);
@@ -123,65 +131,36 @@ const Heatmap = () => {
 
 	return (
 		<div className='flex justify-center'>
-			<Tabs
-				defaultValue='kollywood'
-				className=''
-				onValueChange={value => setCategory(value)}
-			>
-				<TabsList className='grid w-full grid-cols-4 mb-2 bg-slate-950 bg-opacity-80'>
-					<TabsTrigger
-						className='data-[state=active]:bg-green-700 hover:bg-slate-800'
-						value='kollywood'
-					>
-						r/kollywood
-					</TabsTrigger>
-					<TabsTrigger
-						className='data-[state=active]:bg-green-700 hover:bg-slate-800'
-						value='tollywood'
-					>
-						r/tollywood
-					</TabsTrigger>
-					<TabsTrigger
-						className='data-[state=active]:bg-green-700 hover:bg-slate-800'
-						value='MalayalamMovies'
-					>
-						r/MalayalamMovies
-					</TabsTrigger>
-					<TabsTrigger
-						className='data-[state=active]:bg-green-700 hover:bg-slate-800'
-						value='bollywood'
-					>
-						r/bollywood
-					</TabsTrigger>
-				</TabsList>
-				{["kollywood", "tollywood", "MalayalamMovies", "bollywood"].map(cat => (
-					<TabsContent key={cat} value={cat}>
-						<Card className='bg-background/70 p-5 w-full lg:max-w-5xl'>
-							<CardTitle className='text-xl font-bold'>
-								<span className='flex item-center'>
-									<FaRedditAlien
-										size={22}
-										className='self-center mr-2 text-red-500'
-									/>
-									<span className='text-red-400'>r/{cat}</span>
-									{"  "} Frequency Heatmap
-								</span>
-							</CardTitle>
-							<CardDescription className='mb-4'>
-								This heatmap shows the frequency of posts posted in r/{cat}
-								throughout the week and hours of the day.
-							</CardDescription>
-							{isLoading ? (
-								<div className=''>Loading...</div>
-							) : isError ? (
-								<div>Error loading data</div>
-							) : (
-								renderHeatmap(data?.[`${cat}_month_frequency`])
-							)}
-						</Card>
-					</TabsContent>
-				))}
-			</Tabs>
+			<Card className='bg-gray-900/30 backdrop-blur-md p-5 w-full lg:max-w-5xl border-gray-700 shadow-lg'>
+				<CardTitle className='text-xl font-bold text-white'>
+					<span className='flex items-center'>
+						<FaRedditAlien
+							size={22}
+							className='self-center mr-2 text-orange-500'
+						/>
+						<span className='text-orange-500'>r/{sub} </span>
+						Frequency <span className='bg-red-500 px-1'>Heatmap</span>
+					</span>
+				</CardTitle>
+				<CardDescription className='mb-4'>
+					This heatmap shows the frequency of posts posted in r/{sub}
+					throughout the week and hours of the day.
+				</CardDescription>
+				{isLoading ? (
+					<div className='flex items-center space-x-6'>
+						<Skeleton className='h-12 w-12 rounded-full' />
+						<div className='space-y-2'>
+							<h1>Loading</h1>
+							<Skeleton className='h-4 lg:w-[450px] w-[100px]' />
+							<Skeleton className='h-4 lg:w-[840px] w-[260px]' />
+						</div>
+					</div>
+				) : isError ? (
+					<div className='text-red-500'>Error fetching data</div>
+				) : (
+					renderHeatmap(data?.[`${sub}_month_frequency`])
+				)}
+			</Card>
 		</div>
 	);
 };
