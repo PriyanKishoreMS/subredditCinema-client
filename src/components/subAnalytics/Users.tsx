@@ -1,8 +1,8 @@
-// Users.tsx
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
+import { Skeleton } from "../ui/skeleton";
 
 type UserProps = {
 	sub: string;
@@ -10,14 +10,38 @@ type UserProps = {
 	icon: React.ReactNode;
 };
 
+const ipAddrPort = "http://localhost:3000";
+
 const fetchUsers = async (sub: string, type: string, interval: string) => {
-	const response = await fetch(
-		`http://localhost:3000/api/reddit/${sub}/${type}/users?interval=${interval}`
-	);
-	if (!response.ok) {
-		throw new Error("Network response was not ok");
+	try {
+		const response = await fetch(
+			`${ipAddrPort}/api/reddit/${sub}/${type}/users?interval=${interval}`
+		);
+		if (!response.ok) {
+			throw new Error("Network response was not ok");
+		}
+		const res = await response.json();
+		return res;
+	} catch (error) {
+		console.error(error, "error here");
+		throw error;
 	}
-	return response.json();
+};
+
+const UsersSkeleton: React.FC<{
+	state: string;
+}> = ({ state }) => {
+	return (
+		<div className='flex items-center space-x-4'>
+			<div className='space-y-2'>
+				<h1 className='text-md text-gray-500'>{state}</h1>
+				<Skeleton className='h-4 w-[200px]' />
+				<Skeleton className='h-4 w-[250px]' />
+				<Skeleton className='h-4 w-[200px]' />
+				<Skeleton className='h-4 w-[250px]' />
+			</div>
+		</div>
+	);
 };
 
 const Users: React.FC<UserProps> = ({ sub, type, icon }) => {
@@ -49,9 +73,9 @@ const Users: React.FC<UserProps> = ({ sub, type, icon }) => {
 						{selectedInterval}
 					</CardDescription>
 					{isLoading ? (
-						<p>Loading...</p>
+						<UsersSkeleton state='Loading' />
 					) : isError ? (
-						<p>Error fetching data</p>
+						<UsersSkeleton state='Error' />
 					) : (
 						<ul>
 							{data.users.map((user: { user: string; post_count: number }) => (

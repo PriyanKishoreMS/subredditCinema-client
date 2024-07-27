@@ -1,9 +1,10 @@
 import Heatmap from "@/components/subAnalytics/HeatMap";
+import RedditPosts from "@/components/subAnalytics/RedditPosts";
+import Users from "@/components/subAnalytics/Users";
+import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { BiSolidUpvote } from "react-icons/bi";
 import { LuSword } from "react-icons/lu";
-import { Card } from "../ui/card";
-import Users from "./Users";
 
 const Dashboard = () => {
 	const [sub, setSub] = useState("kollywood");
@@ -11,7 +12,7 @@ const Dashboard = () => {
 	return (
 		<div className='min-h-screen'>
 			<div className='flex flex-col md:flex-row'>
-				<Card className='w-50% md:w-64 mx-5 lg:mx-0 h-auto md:h-[calc(100vh-4rem)] overflow-x-auto no-scrollbar lg:overflow-y-auto lg:sticky top-16 left-0 bg-gray-900/30 backdrop-blur-md border-gray-700 shadow-lg z-10'>
+				<Card className='w-50% md:w-64 mx-5 lg:mx-0 h-auto md:h-[calc(100vh-4rem)] overflow-x-auto no-scrollbar lg:overflow-y-auto md:sticky top-16 left-0 bg-gray-900/30 backdrop-blur-md border-gray-700 shadow-lg z-10'>
 					<nav className='flex flex-row justify-evenly md:flex-col md:p-4 p-1 space-x-2 sm:space-x-0 sm:space-y-2'>
 						{["kollywood", "tollywood", "MalayalamMovies", "bollywood"].map(
 							cat => (
@@ -44,6 +45,16 @@ const Dashboard = () => {
 						/>
 					</div>
 					<Heatmap sub={sub} />
+
+					<div className='flex flex-col items-center lg:flex-col lg:justify-center mb-5 gap-3'>
+						<RedditPosts subreddit={sub} category='top' />
+
+						<RedditPosts subreddit={sub} category='controversial' />
+
+						<RedditPosts subreddit={sub} category='top_and_controversial' />
+
+						<RedditPosts subreddit={sub} category='hated' />
+					</div>
 				</div>
 			</div>
 		</div>

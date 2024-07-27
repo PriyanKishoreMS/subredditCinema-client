@@ -61,18 +61,29 @@ const Heatmap: React.FC<{
 		return colorMap[value as keyof typeof colorMap] || "bg-green-0";
 	};
 
+	const HeatmapSkeleton: React.FC<{
+		state: string;
+	}> = ({ state }) => {
+		return (
+			<div className='flex items-center space-x-6'>
+				<div className='space-y-2'>
+					<h1 className='text-gray-500 text-xl'>{state}</h1>
+					<Skeleton className='h-5 lg:w-[450px]' />
+					<Skeleton className='h-5 lg:w-[840px]' />
+					<Skeleton className='h-5 lg:w-[450px]' />
+					<Skeleton className='h-5 lg:w-[840px]' />
+					<Skeleton className='h-5 lg:w-[450px]' />
+					<Skeleton className='h-5 lg:w-[840px]' />
+					<Skeleton className='h-5 lg:w-[450px]' />
+					<Skeleton className='h-5 lg:w-[840px]' />
+				</div>
+			</div>
+		);
+	};
+
 	const renderHeatmap = (frequencyData: FrequencyData | undefined) => {
 		if (!frequencyData) {
-			return (
-				<div className='flex items-center space-x-6'>
-					<Skeleton className='h-12 w-12 rounded-full' />
-					<div className='space-y-2'>
-						<h1>Loading</h1>
-						<Skeleton className='h-4 lg:w-[450px]' />
-						<Skeleton className='h-4 lg:w-[840px]' />
-					</div>
-				</div>
-			);
+			return <HeatmapSkeleton state='no data' />;
 		}
 
 		const days = Object.keys(frequencyData);
@@ -147,16 +158,9 @@ const Heatmap: React.FC<{
 					throughout the week and hours of the day.
 				</CardDescription>
 				{isLoading ? (
-					<div className='flex items-center space-x-6'>
-						<Skeleton className='h-12 w-12 rounded-full' />
-						<div className='space-y-2'>
-							<h1>Loading</h1>
-							<Skeleton className='h-4 lg:w-[450px] w-[100px]' />
-							<Skeleton className='h-4 lg:w-[840px] w-[260px]' />
-						</div>
-					</div>
+					<HeatmapSkeleton state='Loading' />
 				) : isError ? (
-					<div className='text-red-500'>Error fetching data</div>
+					<HeatmapSkeleton state='Error' />
 				) : (
 					renderHeatmap(data?.[`${sub}_month_frequency`])
 				)}
