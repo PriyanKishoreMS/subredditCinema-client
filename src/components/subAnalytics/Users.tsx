@@ -34,11 +34,11 @@ const UsersSkeleton: React.FC<{
 	return (
 		<div className='flex items-center space-x-4'>
 			<div className='space-y-2'>
-				<h1 className='text-md text-gray-500'>{state}</h1>
-				<Skeleton className='h-4 w-[200px]' />
-				<Skeleton className='h-4 w-[250px]' />
-				<Skeleton className='h-4 w-[200px]' />
-				<Skeleton className='h-4 w-[250px]' />
+				<h1 className='text-lg text-gray-500'>{state}</h1>
+				<Skeleton className='h-5 w-[200px]' />
+				<Skeleton className='h-5 w-[250px]' />
+				<Skeleton className='h-5 w-[200px]' />
+				<Skeleton className='h-5 w-[250px]' />
 			</div>
 		</div>
 	);
@@ -81,7 +81,14 @@ const Users: React.FC<UserProps> = ({ sub, type, icon }) => {
 							{data.users.map((user: { user: string; post_count: number }) => (
 								<li key={user.user} className='text-white font-medium text-lg'>
 									<span className='text-orange-500'>u/</span>
-									{user.user} - {user.post_count} posts
+									<a
+										href={`https://www.reddit.com/user/${user.user}/submitted`}
+										target='_blank'
+										rel='noreferrer'
+										className='hover:text-sky-500 transition-colors duration-100'
+									>
+										{user.user} - {user.post_count} posts
+									</a>
 								</li>
 							))}
 						</ul>

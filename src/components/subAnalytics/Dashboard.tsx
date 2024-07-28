@@ -5,6 +5,9 @@ import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { BiSolidUpvote } from "react-icons/bi";
 import { LuSword } from "react-icons/lu";
+import Image from "../Image";
+
+const ipAddrPort = "http://localhost:3000";
 
 const Dashboard = () => {
 	const [sub, setSub] = useState("kollywood");
@@ -22,7 +25,7 @@ const Dashboard = () => {
 									className={`lg:p-3 p-1 rounded-full font-medium text-center sm:text-left transition-colors duration-200 whitespace-nowrap ${
 										sub === cat
 											? "bg-orange-500 text-white"
-											: "text-gray-300 hover:bg-gray-800/50 hover:text-white"
+											: "text-gray-300 hover:bg-gray-700"
 									}`}
 								>
 									r/{cat}
@@ -46,7 +49,7 @@ const Dashboard = () => {
 					</div>
 					<Heatmap sub={sub} />
 
-					<div className='flex flex-col items-center lg:flex-col lg:justify-center mb-5 gap-3'>
+					<div className='flex flex-col items-center lg:justify-center mb-5 gap-3'>
 						<RedditPosts subreddit={sub} category='top' />
 
 						<RedditPosts subreddit={sub} category='controversial' />
@@ -54,6 +57,17 @@ const Dashboard = () => {
 						<RedditPosts subreddit={sub} category='top_and_controversial' />
 
 						<RedditPosts subreddit={sub} category='hated' />
+					</div>
+
+					<div className='flex flex-col items-center justify-center my-10'>
+						<h1 className='text-white italic bg-orange-500 text-3xl'>
+							Bros, this is what you've all been talking about
+						</h1>
+						<Image
+							src={`${ipAddrPort}/public/wordcloud/${sub}_wordcloud.png`}
+							alt='wordcloud'
+							className='w-full lg:w-8/12 h-auto rounded-2xl border border-gray-700 opacity-90 hover:scale-105 transition-transform duration-200 cursor-pointer my-5 shadow-lg'
+						/>
 					</div>
 				</div>
 			</div>

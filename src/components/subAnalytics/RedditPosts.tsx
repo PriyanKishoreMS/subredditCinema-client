@@ -51,6 +51,13 @@ const RedditPosts: React.FC<RedditPostsProps> = ({ subreddit, category }) => {
 	const [selectedInterval, setSelectedInterval] = useState("month");
 	const intervals = ["week", "month", "6months", "year"];
 
+	const categoryMap = {
+		top: "Top",
+		controversial: "Controversial",
+		top_and_controversial: "Top and Controversial",
+		hated: "Flop",
+	};
+
 	const { data, isLoading, isError } = useQuery({
 		queryKey: ["posts", subreddit, selectedInterval, category],
 		queryFn: () => fetchPosts(subreddit, selectedInterval, category),
@@ -80,7 +87,7 @@ const RedditPosts: React.FC<RedditPostsProps> = ({ subreddit, category }) => {
 							{post.upvotes}
 						</CardDescription>
 						<CardDescription className=' flex items-center gap-1'>
-							<FaComment className='text-slate-500' size={20} />
+							<FaComment className='text-cyan-600' size={20} />
 							{post.num_comments}
 						</CardDescription>
 					</div>
@@ -94,7 +101,7 @@ const RedditPosts: React.FC<RedditPostsProps> = ({ subreddit, category }) => {
 			<Tabs value={selectedInterval} onValueChange={setSelectedInterval}>
 				<div className='flex lg:flex-row flex-col justify-between items-center mt-5'>
 					<h1 className='text-white text-2xl italic'>
-						{category} Posts of {selectedInterval}
+						{categoryMap[category]}
 					</h1>
 					<TabsList className='grid lg:w-3/4 lg-full grid-cols-4 mt-2 bg-slate-950/70 bg-opacity-80'>
 						{intervals.map(interval => (
@@ -112,20 +119,20 @@ const RedditPosts: React.FC<RedditPostsProps> = ({ subreddit, category }) => {
 				{intervals.map(interval => (
 					<TabsContent key={interval} value={interval}>
 						{isLoading ? (
-							<div className='flex lg:flex-row flex-col items-center justify-centers gap-3'>
+							<div className='flex lg:flex-row flex-col items-center justify-center gap-3'>
 								{Array.from({ length: 5 }).map((_, index) => (
 									<PostsSkeleton key={index} state='Loading' />
 								))}
 							</div>
 						) : isError ? (
-							<div className='flex lg:flex-row flex-col items-center justify-centers gap-3'>
+							<div className='flex lg:flex-row flex-col items-center justify-center gap-3'>
 								{Array.from({ length: 5 }).map((_, index) => (
 									<PostsSkeleton key={index} state='Error' />
 								))}
 							</div>
 						) : (
-							<div className='flex'>
-								<div className='flex lg:flex-row flex-col items-center justify-centers gap-3'>
+							<div className='flex items-center justify-center'>
+								<div className='flex lg:flex-row flex-col items-center mt-1 justify-center gap-3'>
 									{data.posts.map((post: Post) => renderRedditEmbed(post))}
 								</div>
 							</div>

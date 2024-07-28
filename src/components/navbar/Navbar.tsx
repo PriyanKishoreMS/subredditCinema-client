@@ -1,8 +1,7 @@
-// Navbar.tsx
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { FaReddit } from "react-icons/fa";
+import { PiFilmSlateFill } from "react-icons/pi";
 import { RxHamburgerMenu } from "react-icons/rx";
 
 const Navbar: React.FC = () => {
@@ -29,8 +28,8 @@ const Navbar: React.FC = () => {
 						to='/'
 						className='flex items-center text-2xl font-bold text-white'
 					>
-						<FaReddit className='mr-2 text-orange-500' />
-						<span className='text-orange-500'>SubReddit</span>Sinema
+						<PiFilmSlateFill className='mr-2 text-orange-500' />
+						<span className='text-orange-500'>SubReddit</span>Cinema
 					</Link>
 					<div className='hidden md:flex items-center'>
 						<NavLink to='/' text='Home' />
@@ -78,7 +77,7 @@ const NavLink: React.FC<NavItemProps> = ({ to, text }) => {
 		<Link
 			to={to}
 			className={`flex flex-row items-center ${
-				isActive ? "bg-orange-500" : "focus:bg-orange-500"
+				isActive ? "bg-orange-500" : "focus:bg-orange-500 hover:bg-gray-700"
 			} px-3 py-1 rounded-full text-white mr-5 transition-colors duration-200`}
 			tabIndex={isActive ? 0 : undefined}
 			autoFocus={isActive}
