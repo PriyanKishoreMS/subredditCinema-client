@@ -7,6 +7,8 @@ import { Image, TierList } from "../components/tiermaker/TierList";
 
 const ipAddrPort = "http://localhost:3000";
 
+// test link https://image.tmdb.org/t/p/w300//p2W0wdiy7QyZ6mtFCVLIPUFCBfD.jpg
+
 export const Route = createFileRoute("/tiermaker")({
 	component: TierMaker,
 });

@@ -12,12 +12,18 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as TiermakerImport } from './routes/tiermaker'
+import { Route as PollsImport } from './routes/polls'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
 
 const TiermakerRoute = TiermakerImport.update({
   path: '/tiermaker',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PollsRoute = PollsImport.update({
+  path: '/polls',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -37,6 +43,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/polls': {
+      id: '/polls'
+      path: '/polls'
+      fullPath: '/polls'
+      preLoaderRoute: typeof PollsImport
+      parentRoute: typeof rootRoute
+    }
     '/tiermaker': {
       id: '/tiermaker'
       path: '/tiermaker'
@@ -49,7 +62,11 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
-export const routeTree = rootRoute.addChildren({ IndexRoute, TiermakerRoute })
+export const routeTree = rootRoute.addChildren({
+  IndexRoute,
+  PollsRoute,
+  TiermakerRoute,
+})
 
 /* prettier-ignore-end */
 
@@ -60,11 +77,15 @@ export const routeTree = rootRoute.addChildren({ IndexRoute, TiermakerRoute })
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/polls",
         "/tiermaker"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/polls": {
+      "filePath": "polls.tsx"
     },
     "/tiermaker": {
       "filePath": "tiermaker.tsx"

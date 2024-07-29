@@ -1,6 +1,5 @@
 import Navbar from "@/components/navbar/Navbar";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
 export const Route = createRootRoute({
 	component: () => (
@@ -12,7 +11,6 @@ export const Route = createRootRoute({
 			<main className='pt-16'>
 				<Outlet />
 			</main>
-			<TanStackRouterDevtools />
 		</div>
 	),
 });

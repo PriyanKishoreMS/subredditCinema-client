@@ -1,11 +1,11 @@
 import Heatmap from "@/components/subAnalytics/HeatMap";
 import RedditPosts from "@/components/subAnalytics/RedditPosts";
 import Users from "@/components/subAnalytics/Users";
-import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { BiSolidUpvote } from "react-icons/bi";
 import { LuSword } from "react-icons/lu";
 import Image from "../Image";
+import SubNavbar from "../navbar/SubNavbar";
 
 const ipAddrPort = "http://localhost:3000";
 
@@ -15,25 +15,7 @@ const Dashboard = () => {
 	return (
 		<div className='min-h-screen'>
 			<div className='flex flex-col md:flex-row'>
-				<Card className='w-50% md:w-64 mx-5 lg:mx-0 h-auto md:h-[calc(100vh-4rem)] overflow-x-auto no-scrollbar lg:overflow-y-auto md:sticky top-16 left-0 bg-gray-900/30 backdrop-blur-md border-gray-700 shadow-lg z-10'>
-					<nav className='flex flex-row justify-evenly md:flex-col md:p-4 p-1 space-x-2 sm:space-x-0 sm:space-y-2'>
-						{["kollywood", "tollywood", "MalayalamMovies", "bollywood"].map(
-							cat => (
-								<button
-									key={cat}
-									onClick={() => setSub(cat)}
-									className={`lg:p-3 p-1 rounded-full font-medium text-center sm:text-left transition-colors duration-200 whitespace-nowrap ${
-										sub === cat
-											? "bg-orange-500 text-white"
-											: "text-gray-300 hover:bg-gray-700"
-									}`}
-								>
-									r/{cat}
-								</button>
-							)
-						)}
-					</nav>
-				</Card>
+				<SubNavbar sub={sub} setSub={setSub} />
 				<div className='flex-1 p-6'>
 					<div className='flex flex-col items-center lg:flex-row lg:justify-center mb-5 gap-3'>
 						<Users
@@ -61,7 +43,8 @@ const Dashboard = () => {
 
 					<div className='flex flex-col items-center justify-center my-10'>
 						<h1 className='text-white italic bg-orange-500 text-3xl'>
-							Bros, this is what you've all been talking about
+							Bros, this is what you've all been talking about for the past 30
+							days
 						</h1>
 						<Image
 							src={`${ipAddrPort}/public/wordcloud/${sub}_wordcloud.png`}
