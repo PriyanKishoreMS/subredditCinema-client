@@ -5,7 +5,7 @@ const SubNavbar: React.FC<{
 	setSub: React.Dispatch<React.SetStateAction<string>>;
 }> = ({ sub, setSub }) => {
 	return (
-		<Card className='w-50% md:w-64 mx-5 lg:mx-0 h-auto md:h-[calc(100vh-4rem)] overflow-x-auto no-scrollbar lg:overflow-y-auto md:sticky top-16 left-0 bg-gray-900/30 backdrop-blur-md border-gray-700 shadow-lg z-10'>
+		<Card className='w-50% md:w-64 mx-5 lg:mx-0 h-auto md:h-[calc(100vh-4rem)] overflow-x-auto no-scrollbar lg:overflow-y-auto md:sticky top-16 left-0 bg-gray-900/70 backdrop-blur-md border-gray-700 shadow-lg z-10'>
 			<nav className='flex flex-row justify-evenly md:flex-col md:p-4 p-1 space-x-2 sm:space-x-0 sm:space-y-2'>
 				{["kollywood", "tollywood", "MalayalamMovies", "bollywood"].map(cat => (
 					<button

@@ -48,7 +48,7 @@ const PostsSkeleton: React.FC<{
 };
 
 const RedditPosts: React.FC<RedditPostsProps> = ({ subreddit, category }) => {
-	const [selectedInterval, setSelectedInterval] = useState("week");
+	const [selectedInterval, setSelectedInterval] = useState("month");
 	const intervals = ["week", "month", "6months", "year"];
 
 	const categoryMap = {

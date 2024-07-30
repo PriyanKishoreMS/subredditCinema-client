@@ -13,6 +13,7 @@ export interface Poll {
 	user_avatar: string;
 	total_votes: number;
 	vote_count: Record<string, number>;
+	user_vote?: number | null
 }
 
 export interface PollOption {
