@@ -14,6 +14,8 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as TiermakerImport } from './routes/tiermaker'
 import { Route as PollsImport } from './routes/polls'
 import { Route as IndexImport } from './routes/index'
+import { Route as SurveysIndexImport } from './routes/surveys/index'
+import { Route as SurveysSurveyIdImport } from './routes/surveys/$surveyId'
 
 // Create/Update Routes
 
@@ -29,6 +31,16 @@ const PollsRoute = PollsImport.update({
 
 const IndexRoute = IndexImport.update({
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SurveysIndexRoute = SurveysIndexImport.update({
+  path: '/surveys/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SurveysSurveyIdRoute = SurveysSurveyIdImport.update({
+  path: '/surveys/$surveyId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -57,6 +69,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TiermakerImport
       parentRoute: typeof rootRoute
     }
+    '/surveys/$surveyId': {
+      id: '/surveys/$surveyId'
+      path: '/surveys/$surveyId'
+      fullPath: '/surveys/$surveyId'
+      preLoaderRoute: typeof SurveysSurveyIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/surveys/': {
+      id: '/surveys/'
+      path: '/surveys'
+      fullPath: '/surveys'
+      preLoaderRoute: typeof SurveysIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -66,6 +92,8 @@ export const routeTree = rootRoute.addChildren({
   IndexRoute,
   PollsRoute,
   TiermakerRoute,
+  SurveysSurveyIdRoute,
+  SurveysIndexRoute,
 })
 
 /* prettier-ignore-end */
@@ -78,7 +106,9 @@ export const routeTree = rootRoute.addChildren({
       "children": [
         "/",
         "/polls",
-        "/tiermaker"
+        "/tiermaker",
+        "/surveys/$surveyId",
+        "/surveys/"
       ]
     },
     "/": {
@@ -89,6 +119,12 @@ export const routeTree = rootRoute.addChildren({
     },
     "/tiermaker": {
       "filePath": "tiermaker.tsx"
+    },
+    "/surveys/$surveyId": {
+      "filePath": "surveys/$surveyId.tsx"
+    },
+    "/surveys/": {
+      "filePath": "surveys/index.tsx"
     }
   }
 }

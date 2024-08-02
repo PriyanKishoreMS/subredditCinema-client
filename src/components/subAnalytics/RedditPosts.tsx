@@ -67,31 +67,30 @@ const RedditPosts: React.FC<RedditPostsProps> = ({ subreddit, category }) => {
 		const embedUrl = `https://www.reddit.com${post.url}`;
 		return (
 			<div key={post.id}>
-				<Card
-					onClick={() => {
-						window.open(embedUrl, "_blank");
-					}}
-					className='cursor-pointer flex flex-col items-start p-5 lg:w-48 lg:h-64 w-80 h-36 bg-gray-900/30 backdrop-blur-md border-gray-700 shadow-lg hover:scale-105 transition-transform duration-200 justify-between'
-				>
-					<div>
-						<CardTitle className='text-base leading-1'>
-							{post.title.length > 70
-								? post.title.slice(0, 70) + "..."
-								: post.title}
-						</CardTitle>
-						<CardDescription className='mt-1'>u/{post.author}</CardDescription>
-					</div>
-					<div className='flex items-center w-full justify-between'>
-						<CardDescription className='flex items-center gap-1'>
-							<BiSolidUpvote className='text-orange-500' size={20} />{" "}
-							{post.upvotes}
-						</CardDescription>
-						<CardDescription className=' flex items-center gap-1'>
-							<FaComment className='text-cyan-600' size={20} />
-							{post.num_comments}
-						</CardDescription>
-					</div>
-				</Card>
+				<a href={embedUrl} target='_blank' rel='noreferrer'>
+					<Card className='cursor-pointer flex flex-col items-start p-5 lg:w-48 lg:h-64 w-80 h-36 bg-gray-900/30 backdrop-blur-md border-gray-700 shadow-lg hover:scale-105 transition-transform duration-200 justify-between'>
+						<div>
+							<CardTitle className='text-base leading-1'>
+								{post.title.length > 70
+									? post.title.slice(0, 70) + "..."
+									: post.title}
+							</CardTitle>
+							<CardDescription className='mt-1'>
+								u/{post.author}
+							</CardDescription>
+						</div>
+						<div className='flex items-center w-full justify-between'>
+							<CardDescription className='flex items-center gap-1'>
+								<BiSolidUpvote className='text-orange-500' size={20} />{" "}
+								{post.upvotes}
+							</CardDescription>
+							<CardDescription className=' flex items-center gap-1'>
+								<FaComment className='text-cyan-600' size={20} />
+								{post.num_comments}
+							</CardDescription>
+						</div>
+					</Card>
+				</a>
 			</div>
 		);
 	};

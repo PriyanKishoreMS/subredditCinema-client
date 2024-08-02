@@ -1,8 +1,10 @@
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { FaRedditAlien } from "react-icons/fa";
 import { PiFilmSlateFill } from "react-icons/pi";
 import { RxHamburgerMenu } from "react-icons/rx";
+import { Button } from "../ui/button";
 
 const Navbar: React.FC = () => {
 	const [scrolled, setScrolled] = useState<boolean>(false);
@@ -19,7 +21,7 @@ const Navbar: React.FC = () => {
 	return (
 		<nav
 			className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-				scrolled ? "bg-gray-900/50 backdrop-blur-md" : "bg-transparent"
+				scrolled ? "bg-gray-900/50 backdrop-blur-xl" : "bg-transparent"
 			}`}
 		>
 			<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -48,12 +50,25 @@ const Navbar: React.FC = () => {
 							side='right'
 							className='w-[300px] bg-gray-900 bg-opacity-50 backdrop-blur-md border-none sm:w-[400px]'
 						>
-							<nav className='flex flex-col space-y-4 mt-8'>
-								<MobileNavItem to='/' text='Home' />
-								<MobileNavItem to='/tiermaker' text='Tiermaker' />
-								<MobileNavItem to='/polls' text='Polls' />
-								<MobileNavItem to='/surveys' text='Surveys' />
-								<MobileNavItem to='/memerepo' text='Meme Repo' />
+							<nav className='flex flex-col justify-between h-full'>
+								<div className='flex flex-col space-y-4 mt-8'>
+									<MobileNavItem to='/' text='Home' />
+									<MobileNavItem to='/tiermaker' text='Tiermaker' />
+									<MobileNavItem to='/polls' text='Polls' />
+									<MobileNavItem to='/surveys' text='Surveys' />
+									<MobileNavItem to='/memerepo' text='Meme Repo' />
+								</div>
+								<Button
+									size='lg'
+									variant='default'
+									className=' m-5 bg-orange-600 hover:bg-orange-700 text-white items-center'
+									onClick={() =>
+										window.open("http://localhost:3000/login", "_blank")
+									}
+								>
+									<FaRedditAlien size={20} className='mr-2 self-center' />
+									<h1 className='text-lg font-bold'>Verify</h1>
+								</Button>
 							</nav>
 						</SheetContent>
 					</Sheet>

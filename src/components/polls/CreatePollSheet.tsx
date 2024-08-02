@@ -122,7 +122,7 @@ const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 	if (!isOpen) return null;
 
 	return (
-		<div className='fixed inset-0 flex justify-center items-center'>
+		<div className='fixed inset-0 bg-slate-700 bg-opacity-50 flex justify-center items-center'>
 			<Card className='bg-gray-900/95 border border-gray-700 backdrop-blur-md p-6 rounded-lg max-w-2xl w-full'>
 				<div className='flex justify-between items-center'>
 					<h2 className='text-2xl font-bold my-4 self-center'>
