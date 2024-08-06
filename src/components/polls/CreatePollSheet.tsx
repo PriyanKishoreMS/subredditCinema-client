@@ -129,11 +129,13 @@ const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 						Create New Poll
 					</h2>
 					<Button
+						type='button'
+						size='icon'
 						variant='ghost'
 						className='hover:bg-red-600/50'
 						onClick={onClose}
 					>
-						<Cross1Icon className='w-4' />
+						<Cross1Icon className='w-4 h-4' />
 					</Button>
 				</div>
 				<form onSubmit={handleSubmit} className='space-y-4'>
@@ -190,7 +192,7 @@ const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 					<div>
 						<label className='block mb-1'>Options</label>
 						{pollData.options.map((option, index) => (
-							<div key={option.id} className='flex mb-2'>
+							<div key={index} className='flex mb-2'>
 								<Input
 									value={option.text}
 									onChange={e => handleOptionChange(index, e.target.value)}
@@ -200,11 +202,12 @@ const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 								/>
 								<Button
 									type='button'
+									size='icon'
 									onClick={() => removeOption(index)}
 									className='bg-red-500/50 hover:bg-red-500 text-white px-2 py-1 rounded'
 									variant='ghost'
 								>
-									Remove
+									<Cross1Icon className='w-4' />
 								</Button>
 							</div>
 						))}
@@ -213,6 +216,7 @@ const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 							onClick={addOption}
 							className='bg-blue-500/50 hover:bg-blue-500 text-white px-2 py-1 rounded'
 							variant='ghost'
+							{...{ disabled: pollData.options.length >= 7 }}
 						>
 							Add Option
 						</Button>

@@ -37,7 +37,7 @@ type SurveyData = {
 const ipAddrPort = "http://localhost:3000";
 
 const subreddits = ["kollywood", "tollywood", "bollywood", "MalayalamMovies"];
-const questionTypes = ["text", "single_choice", "multiple_choice"];
+const questionTypes = ["text", "single", "multiple"];
 
 const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 	isOpen,
@@ -99,7 +99,7 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 				{
 					order: prev.questions.length + 1,
 					text: "",
-					type: "text",
+					type: "single",
 					is_required: false,
 					options: [],
 				},
@@ -113,6 +113,15 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 			questions: prev.questions.map((q, i) =>
 				i === index ? { ...q, [field]: value } : q
 			),
+		}));
+	};
+
+	const removeQuestion = (questionIndex: number) => {
+		setSurveyData(prev => ({
+			...prev,
+			questions: prev.questions
+				.filter((_, i) => i !== questionIndex)
+				.map((q, newIndex) => ({ ...q, order: newIndex + 1 })),
 		}));
 	};
 
@@ -156,9 +165,26 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 		}));
 	};
 
+	const removeOption = (questionIndex: number, optionIndex: number) => {
+		setSurveyData(prev => ({
+			...prev,
+			questions: prev.questions.map((q, qI) =>
+				qI === questionIndex
+					? {
+							...q,
+							options: q.options
+								.filter((_, oI) => oI !== optionIndex)
+								.map((o, newIndex) => ({ ...o, order: newIndex + 1 })),
+						}
+					: q
+			),
+		}));
+	};
+
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		surveyData.end_time = new Date(surveyData.end_time).toISOString();
+		console.log(surveyData, "surveyData");
 		createSurveyMutation.mutate(surveyData);
 	};
 
@@ -170,7 +196,7 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 				className='bg-gray-900/95 border border-gray-700 backdrop-blur-md rounded-lg w-full max-w-4xl m-4 flex flex-col'
 				style={{ height: "85vh" }}
 			>
-				<div className='border-b border-gray-400 flex justify-between items-center'>
+				<div className='border-b border-gray-500 flex justify-between items-center'>
 					<h2 className='text-2xl font-bold p-6'>Create New Survey</h2>
 					<Button
 						variant='ghost'
@@ -182,20 +208,25 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 				</div>
 				<div className='overflow-y-auto flex-grow p-6'>
 					<form onSubmit={handleSubmit} className='space-y-6'>
-						<div className='space-y-2'>
-							<label className='block font-medium'>Select Subreddit</label>
-							<div className='grid grid-cols-2 lg:grid-cols-4'>
+						<div className='bg-gray-800 p-6 rounded-lg shadow-md'>
+							<label className='text-lg font-semibold block mb-4'>
+								Select Subreddit
+							</label>
+							<div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
 								{subreddits.map(sub => (
-									<label key={sub} className='flex items-center'>
+									<label
+										key={sub}
+										className='flex items-center space-x-2 cursor-pointer'
+									>
 										<input
 											type='radio'
 											name='subreddit'
 											value={sub}
 											checked={surveyData.subreddit === sub}
 											onChange={handleInputChange}
-											className='mr-1'
+											className='form-radio text-blue-500'
 										/>
-										{sub}
+										<span>{sub}</span>
 									</label>
 								))}
 							</div>
@@ -208,6 +239,7 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 							<Input
 								id='title'
 								name='title'
+								placeholder="What's your survey title?"
 								value={surveyData.title}
 								onChange={handleInputChange}
 								required
@@ -222,14 +254,15 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 							<Textarea
 								id='description'
 								name='description'
+								placeholder="What's your survey about?"
 								value={surveyData.description}
 								onChange={handleInputChange}
 								className='w-full border border-gray-500 bg-gray-800 rounded p-2'
 							/>
 						</div>
 
-						<div className='space-y-2'>
-							<label className='block mb-1 font-medium'>Questions</label>
+						<div className='space-y-8'>
+							<label className='text-lg font-semibold'>Questions</label>
 							{surveyData.questions.map((question, qIndex) => (
 								<div key={question.order} className='border p-4 mb-4 rounded'>
 									{question.order}
@@ -274,21 +307,29 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 										/>
 										Required
 									</label>
-									{(question.type === "single_choice" ||
-										question.type === "multiple_choice") && (
-										<div>
+									{(question.type === "single" ||
+										question.type === "multiple") && (
+										<>
 											<h4 className='font-bold mb-2'>Options</h4>
 											{question.options.map((option, oIndex) => (
-												<input
-													key={option.order}
-													value={option.text}
-													onChange={e =>
-														updateOption(qIndex, oIndex, e.target.value)
-													}
-													placeholder={`Option ${oIndex + 1}`}
-													required
-													className='w-full border rounded p-2 mb-2'
-												/>
+												<div key={option.order}>
+													<Input
+														key={option.order}
+														value={option.text}
+														onChange={e =>
+															updateOption(qIndex, oIndex, e.target.value)
+														}
+														placeholder={`Option ${oIndex + 1}`}
+														required
+														className='w-full border rounded p-2 mb-2'
+													/>
+													<Button>
+														<Cross1Icon
+															className='w-4 h-4'
+															onClick={() => removeOption(qIndex, oIndex)}
+														/>
+													</Button>
+												</div>
 											))}
 											<Button
 												type='button'
@@ -297,15 +338,22 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 											>
 												Add Option
 											</Button>
-										</div>
+										</>
 									)}
+									<Button>
+										<Cross1Icon
+											className='w-4 h-4'
+											onClick={() => removeQuestion(qIndex)}
+										/>
+									</Button>
 								</div>
 							))}
+
 							<Button
 								variant='default'
 								type='button'
 								onClick={addQuestion}
-								className=' px-2 py-1 rounded'
+								className='mt-4'
 							>
 								Add Question
 							</Button>
@@ -327,7 +375,7 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 						</div>
 					</form>
 				</div>
-				<div className='border-t p-6 flex justify-end'>
+				<div className='border-t border-gray-500 p-6 flex justify-end'>
 					<button
 						onClick={handleSubmit}
 						className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600'

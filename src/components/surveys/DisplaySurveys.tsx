@@ -1,3 +1,4 @@
+import { useApi } from "@/utils";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
@@ -10,29 +11,23 @@ import CreateSurveySheet from "./CreateSurveySheet";
 import SurveyCard from "./SurveyCard";
 import { SurveysResponse } from "./types";
 
-const ipAddrPort = "http://localhost:3000";
-
-const fetchSurvyes = async (
-	page: number,
-	sub: string
-): Promise<SurveysResponse> => {
-	const response = await fetch(
-		`${ipAddrPort}/api/survey/all?page=${page}&sub=${sub}`
-	);
-	if (!response.ok) {
-		throw new Error("Network response was not ok");
-	}
-	return response.json();
-};
-
 const DisplaySurveys = () => {
 	const [sub, setSub] = useState("all");
 	const [page, setPage] = useState(1);
 	const [isCreateSurveyOpen, setIsCreateSurveyOpen] = useState(false);
+	const { fetchWithoutToken } = useApi();
 
 	const { data, isLoading, isError, error } = useQuery<SurveysResponse, Error>({
 		queryKey: ["surveys", page, sub],
-		queryFn: () => fetchSurvyes(page, sub),
+		queryFn: async () => {
+			const response = await fetchWithoutToken(
+				`/api/survey/all?page=${page}&sub=${sub}`
+			);
+			if (!response.ok) {
+				throw new Error("Network response was not ok");
+			}
+			return response.json();
+		},
 	});
 
 	const surveys = data?.surveys || [];

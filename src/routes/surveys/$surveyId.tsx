@@ -13,6 +13,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { IoIosArrowRoundBack } from "react-icons/io";
 
 export const Route = createFileRoute("/surveys/$surveyId")({
 	component: SurveyPage,
@@ -145,14 +146,27 @@ function SurveyPage() {
 	};
 
 	return (
-		<Card className='max-w-6xl mx-auto p-6'>
-			<CardHeader>
-				<Link to='/surveys' className='text-blue-500'>
-					Back to surveys
+		<Card className='md:max-w-5xl mx-auto bg-gray-950/70 backdrop-blur-md border-gray-700 p-6'>
+			<Button size='icon' variant='outline' className='p-5 rounded-xl'>
+				<Link to='/surveys'>
+					<IoIosArrowRoundBack className='w-8 h-8 text-sky-500' />
 				</Link>
+			</Button>
+			<CardHeader>
+				<div className='flex items-start justify-between  mb-4'>
+					<div className='flex flex-col justify-center w-full items-center'>
+						<CardTitle className='text-2xl font-bold text-center'>
+							{survey.title}
+						</CardTitle>
+						<CardDescription
+							className={`mb-8 w-full text-justify ${survey.description.length > 30 ? "text-justify" : "text-center"}`}
+						>
+							{survey.description}
+						</CardDescription>
+					</div>
+				</div>
 			</CardHeader>
-			<CardTitle className='text-2xl font-bold mb-4'>{survey.title}</CardTitle>
-			<CardDescription className='mb-8'>{survey.description}</CardDescription>
+
 			<CardContent>
 				{survey.questions.map(question => (
 					<div key={question.question_id} className='mb-8'>
@@ -162,6 +176,8 @@ function SurveyPage() {
 						</p>
 						{question.type === "text" && (
 							<Input
+								placeholder='Type your answer here'
+								className='w-full border border-gray-500 bg-gray-800 rounded p-2'
 								type='text'
 								onChange={e =>
 									handleAnswerChange(question.question_id, e.target.value)

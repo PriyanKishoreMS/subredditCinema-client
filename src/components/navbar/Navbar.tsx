@@ -1,4 +1,5 @@
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth } from "@/contexts/AuthContext";
 import { Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { FaRedditAlien } from "react-icons/fa";
@@ -8,6 +9,32 @@ import { Button } from "../ui/button";
 
 const Navbar: React.FC = () => {
 	const [scrolled, setScrolled] = useState<boolean>(false);
+
+	const { user, login } = useAuth();
+
+	const handleLogin = () => {
+		const popup = window.open("http://localhost:3000/login", "Reddit Login");
+
+		window.addEventListener(
+			"message",
+			event => {
+				if (event.origin !== "http://localhost:3000") return;
+
+				if (event.data.type === "AUTH_SUCCESS" && popup != null) {
+					console.log(event.data.tokens);
+					const { accessToken, refreshToken } = event.data.tokens;
+					const {
+						Username: username,
+						RedditUID: id,
+						Avatar: avatar,
+					} = event.data.tokens.user;
+					login({ accessToken, refreshToken }, { username, id, avatar });
+					popup.close();
+				}
+			},
+			false
+		);
+	};
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -34,11 +61,10 @@ const Navbar: React.FC = () => {
 						<span className='text-orange-500'>SubReddit</span>Cinema
 					</Link>
 					<div className='hidden md:flex items-center'>
-						<NavLink to='/' text='Home' />
+						<NavLink to='/' text='Stats' />
 						<NavLink to='/tiermaker' text='Tiermaker' />
 						<NavLink to='/polls' text='Polls' />
 						<NavLink to='/surveys' text='Surveys' />
-						<NavLink to='/memerepo' text='Meme Repo' />
 					</div>
 					<Sheet>
 						<SheetTrigger asChild className='md:hidden'>
@@ -62,11 +88,10 @@ const Navbar: React.FC = () => {
 									size='lg'
 									variant='default'
 									className=' m-5 bg-orange-600 hover:bg-orange-700 text-white items-center'
-									onClick={() =>
-										window.open("http://localhost:3000/login", "_blank")
-									}
+									onClick={handleLogin}
 								>
 									<FaRedditAlien size={20} className='mr-2 self-center' />
+									<h1>{user ? user.username : "Login"}</h1>
 									<h1 className='text-lg font-bold'>Verify</h1>
 								</Button>
 							</nav>
