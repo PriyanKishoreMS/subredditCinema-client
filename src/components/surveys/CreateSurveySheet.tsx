@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import {
 	Select,
 	SelectContent,
@@ -206,6 +207,7 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 						<Cross1Icon className='w-4' />
 					</Button>
 				</div>
+
 				<div className='overflow-y-auto flex-grow p-6'>
 					<form onSubmit={handleSubmit} className='space-y-6'>
 						<div className='bg-gray-800 p-6 rounded-lg shadow-md'>
@@ -243,12 +245,12 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 								value={surveyData.title}
 								onChange={handleInputChange}
 								required
-								className='w-full border border-gray-500 bg-gray-800 rounded p-2'
+								className='w-full bg-gray-800 rounded-lg p-2'
 							/>
 						</div>
 
 						<div className='space-y-2'>
-							<label htmlFor='description' className='block mb-1 font-medium'>
+							<label htmlFor='description' className='block mb-1'>
 								Description
 							</label>
 							<Textarea
@@ -257,15 +259,30 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 								placeholder="What's your survey about?"
 								value={surveyData.description}
 								onChange={handleInputChange}
-								className='w-full border border-gray-500 bg-gray-800 rounded p-2'
+								className='w-full bg-gray-800 rounded-lg p-2'
 							/>
 						</div>
 
-						<div className='space-y-8'>
+						<div className='space-y-8 flex flex-col'>
 							<label className='text-lg font-semibold'>Questions</label>
 							{surveyData.questions.map((question, qIndex) => (
-								<div key={question.order} className='border p-4 mb-4 rounded'>
-									{question.order}
+								<div
+									key={question.order}
+									className='bg-gray-800 p-6 rounded-lg shadow-md'
+								>
+									<div className='flex items-center justify-between mb-4'>
+										<span className='text-xl font-medium'>
+											Question {question.order}
+										</span>
+										<Button
+											type='button'
+											variant='destructive'
+											onClick={() => removeQuestion(qIndex)}
+										>
+											<Cross1Icon className='w-4 h-4 mr-2' />
+											Remove Question
+										</Button>
+									</div>
 									<Input
 										value={question.text}
 										onChange={e =>
@@ -273,46 +290,53 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 										}
 										placeholder='Question text'
 										required
-										className='w-full border border-gray-500 bg-gray-800 rounded p-2 mb-2'
+										className='w-full border bg-gray-700 rounded-lg p-3 mb-4'
 									/>
-									<Select
-										value={question.type}
-										onValueChange={value =>
-											updateQuestion(qIndex, "type", value)
-										} // className='border rounded p-2 mb-2'
-									>
-										<SelectTrigger className='w-[180px]'>
-											<SelectValue placeholder='Type' />
-										</SelectTrigger>
-										<SelectContent>
-											{questionTypes.map(type => (
-												<SelectItem
-													className='bg-gray-900'
-													key={type}
-													value={type}
-												>
-													{type.replace("_", " ")}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-									<label className='inline-flex items-center mb-2'>
-										<Input
-											type='checkbox'
-											checked={question.is_required}
-											onChange={e =>
-												updateQuestion(qIndex, "is_required", e.target.checked)
+									<div className='flex items-center justify-between mb-4'>
+										<Select
+											value={question.type}
+											onValueChange={value =>
+												updateQuestion(qIndex, "type", value)
 											}
-											className='mr-2'
-										/>
-										Required
-									</label>
+										>
+											<SelectTrigger className='w-[180px] bg-gray-700'>
+												<SelectValue placeholder='Type' />
+											</SelectTrigger>
+											<SelectContent className='bg-gray-800'>
+												{questionTypes.map(type => (
+													<SelectItem
+														className='text-white '
+														key={type}
+														value={type}
+													>
+														{type.replace("_", " ")}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										<Label className='inline-flex items-center justify-center'>
+											<Input
+												type='checkbox'
+												checked={question.is_required}
+												onChange={e =>
+													updateQuestion(
+														qIndex,
+														"is_required",
+														e.target.checked
+													)
+												}
+												className='mr-2'
+											/>
+											Required
+										</Label>
+									</div>
+
 									{(question.type === "single" ||
 										question.type === "multiple") && (
 										<>
 											<h4 className='font-bold mb-2'>Options</h4>
 											{question.options.map((option, oIndex) => (
-												<div key={option.order}>
+												<div key={option.order} className='flex'>
 													<Input
 														key={option.order}
 														value={option.text}
@@ -321,13 +345,15 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 														}
 														placeholder={`Option ${oIndex + 1}`}
 														required
-														className='w-full border rounded p-2 mb-2'
+														className='w-80 border bg-gray-700 rounded-lg p-3 mb-4'
 													/>
-													<Button>
-														<Cross1Icon
-															className='w-4 h-4'
-															onClick={() => removeOption(qIndex, oIndex)}
-														/>
+													<Button
+														type='button'
+														variant='destructive'
+														className='ml-2'
+														onClick={() => removeOption(qIndex, oIndex)}
+													>
+														<Cross1Icon className='w-4 h-4' />
 													</Button>
 												</div>
 											))}
@@ -335,17 +361,12 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 												type='button'
 												onClick={() => addOption(qIndex)}
 												className=' px-2 py-1 rounded'
+												{...{ disabled: question.options.length >= 5 }}
 											>
 												Add Option
 											</Button>
 										</>
 									)}
-									<Button>
-										<Cross1Icon
-											className='w-4 h-4'
-											onClick={() => removeQuestion(qIndex)}
-										/>
-									</Button>
 								</div>
 							))}
 
@@ -353,24 +374,27 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 								variant='default'
 								type='button'
 								onClick={addQuestion}
-								className='mt-4'
+								className='mt-4 w-52'
 							>
 								Add Question
 							</Button>
 						</div>
 
-						<div className='space-y-2'>
-							<label htmlFor='end_time' className='block font-medium'>
+						<div className='relative'>
+							<label htmlFor='end_time' className='block mb-1 text-white'>
 								End Time
 							</label>
-							<Input
+							<input
 								id='end_time'
 								name='end_time'
 								type='datetime-local'
 								value={surveyData.end_time}
 								onChange={handleInputChange}
 								required
-								className='w-full border border-gray-500 bg-gray-800 rounded p-2'
+								className='w-full border rounded p-2 bg-gray-800 text-white border-gray-600'
+								style={{
+									colorScheme: "dark",
+								}}
 							/>
 						</div>
 					</form>

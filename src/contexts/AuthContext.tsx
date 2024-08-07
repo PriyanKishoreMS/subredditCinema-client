@@ -13,6 +13,7 @@ interface AuthContextType {
 		user: { username: string; id: string; avatar: string }
 	) => void;
 	logout: () => void;
+	handleLogin: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -61,6 +62,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 		localStorage.removeItem("refreshToken");
 	};
 
+	const handleLogin = () => {
+		const popup = window.open("http://localhost:3000/login", "Reddit Login");
+
+		window.addEventListener(
+			"message",
+			event => {
+				if (event.origin !== "http://localhost:3000") return;
+
+				if (event.data.type === "AUTH_SUCCESS" && popup != null) {
+					console.log(event.data.tokens);
+					const { accessToken, refreshToken } = event.data.tokens;
+					const {
+						Username: username,
+						RedditUID: id,
+						Avatar: avatar,
+					} = event.data.tokens.user;
+					login({ accessToken, refreshToken }, { username, id, avatar });
+					popup.close();
+				}
+			},
+			false
+		);
+	};
+
 	useEffect(() => {
 		setUser(
 			accessToken
@@ -77,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
 	return (
 		<AuthContext.Provider
-			value={{ accessToken, refreshToken, user, login, logout }}
+			value={{ accessToken, refreshToken, user, login, logout, handleLogin }}
 		>
 			{children}
 		</AuthContext.Provider>

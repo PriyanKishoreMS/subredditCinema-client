@@ -1,12 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatFutureTime, formatPastTime } from "@/utils";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import React from "react";
@@ -30,24 +24,19 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey }) => {
 					<div className='flex items-center space-x-4'>
 						<Avatar>
 							<AvatarImage src={survey.avatar} alt={survey.username} />
-							<AvatarFallback>
-								{survey.username.slice(0, 2).toUpperCase()}
-							</AvatarFallback>
+							<AvatarFallback>{survey.username}</AvatarFallback>
 						</Avatar>
 						<div>
-							<CardTitle className='text-white'>{survey.title}</CardTitle>
-							<CardDescription className='text-gray-400 flex items-center'>
-								u/{survey.username}
-							</CardDescription>
+							<CardTitle className='text-white'>u/{survey.username}</CardTitle>
+							<Badge
+								variant='secondary'
+								className='bg-gray-800 text-gray-300 group-hover:bg-orange-600 group-hover:text-white mt-2'
+							>
+								r/{survey.subreddit}
+							</Badge>
 						</div>
 					</div>
 					<div>
-						<Badge
-							variant='secondary'
-							className='bg-gray-800 text-gray-300 group-hover:bg-orange-600 group-hover:text-white'
-						>
-							r/{survey.subreddit}
-						</Badge>
 						<h1 className='mt-2 ml-2 text-gray-400 text-xs'>
 							#Response: {survey.total_responses}
 						</h1>
@@ -55,6 +44,7 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey }) => {
 				</div>
 			</CardHeader>
 			<CardContent>
+				<CardTitle className='mb-4'>{survey.title}</CardTitle>
 				{survey.description && (
 					<p className='text-gray-300 mb-4'>{survey.description}</p>
 				)}

@@ -5,36 +5,16 @@ import { useEffect, useState } from "react";
 import { FaRedditAlien } from "react-icons/fa";
 import { PiFilmSlateFill } from "react-icons/pi";
 import { RxHamburgerMenu } from "react-icons/rx";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
+import { CardTitle } from "../ui/card";
 
-const Navbar: React.FC = () => {
+const Navbar: React.FC<{
+	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ setOpen }) => {
 	const [scrolled, setScrolled] = useState<boolean>(false);
 
-	const { user, login } = useAuth();
-
-	const handleLogin = () => {
-		const popup = window.open("http://localhost:3000/login", "Reddit Login");
-
-		window.addEventListener(
-			"message",
-			event => {
-				if (event.origin !== "http://localhost:3000") return;
-
-				if (event.data.type === "AUTH_SUCCESS" && popup != null) {
-					console.log(event.data.tokens);
-					const { accessToken, refreshToken } = event.data.tokens;
-					const {
-						Username: username,
-						RedditUID: id,
-						Avatar: avatar,
-					} = event.data.tokens.user;
-					login({ accessToken, refreshToken }, { username, id, avatar });
-					popup.close();
-				}
-			},
-			false
-		);
-	};
+	const { user } = useAuth();
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -61,7 +41,7 @@ const Navbar: React.FC = () => {
 						<span className='text-orange-500'>SubReddit</span>Cinema
 					</Link>
 					<div className='hidden md:flex items-center'>
-						<NavLink to='/' text='Stats' />
+						<NavLink to='/' text='Home' />
 						<NavLink to='/tiermaker' text='Tiermaker' />
 						<NavLink to='/polls' text='Polls' />
 						<NavLink to='/surveys' text='Surveys' />
@@ -84,16 +64,29 @@ const Navbar: React.FC = () => {
 									<MobileNavItem to='/surveys' text='Surveys' />
 									<MobileNavItem to='/memerepo' text='Meme Repo' />
 								</div>
-								<Button
-									size='lg'
-									variant='default'
-									className=' m-5 bg-orange-600 hover:bg-orange-700 text-white items-center'
-									onClick={handleLogin}
-								>
-									<FaRedditAlien size={20} className='mr-2 self-center' />
-									<h1>{user ? user.username : "Login"}</h1>
-									<h1 className='text-lg font-bold'>Verify</h1>
-								</Button>
+								{user ? (
+									<Button
+										variant='default'
+										className='flex md:hidden m-5 items-center'
+										onClick={() => setOpen(true)}
+									>
+										<Avatar>
+											<AvatarImage src={user.avatar} alt={user.username} />
+											<AvatarFallback>{user.username}</AvatarFallback>
+										</Avatar>
+										<CardTitle>u/{user.username}</CardTitle>
+									</Button>
+								) : (
+									<Button
+										size='lg'
+										variant='default'
+										className='flex md:hidden m-5 bg-orange-600 hover:bg-orange-700 text-white items-center'
+										onClick={() => setOpen(true)}
+									>
+										<FaRedditAlien size={20} className='mr-2 self-center' />
+										<h1 className='text-lg font-bold'>Verify</h1>
+									</Button>
+								)}
 							</nav>
 						</SheetContent>
 					</Sheet>

@@ -1,3 +1,4 @@
+import { useAuth } from "@/contexts/AuthContext";
 import { useApi } from "@/utils";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
@@ -5,6 +6,8 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { FaChevronLeft } from "react-icons/fa6";
+import Login from "../navbar/LoginSheet";
+import Logout from "../navbar/LogoutSheet";
 import SubNavbar from "../navbar/SubNavbar";
 import { Button } from "../ui/button";
 import CreateSurveySheet from "./CreateSurveySheet";
@@ -15,13 +18,23 @@ const DisplaySurveys = () => {
 	const [sub, setSub] = useState("all");
 	const [page, setPage] = useState(1);
 	const [isCreateSurveyOpen, setIsCreateSurveyOpen] = useState(false);
+	const [isLogSheetOpen, setIsLogSheetOpen] = useState(false);
+	const { user } = useAuth();
+
 	const { fetchWithoutToken } = useApi();
+	const categories = [
+		"all",
+		"kollywood",
+		"tollywood",
+		"MalayalamMovies",
+		"bollywood",
+	];
 
 	const { data, isLoading, isError, error } = useQuery<SurveysResponse, Error>({
 		queryKey: ["surveys", page, sub],
 		queryFn: async () => {
 			const response = await fetchWithoutToken(
-				`/api/survey/all?page=${page}&sub=${sub}`
+				`/api/survey?page=${page}&sub=${sub}`
 			);
 			if (!response.ok) {
 				throw new Error("Network response was not ok");
@@ -39,13 +52,17 @@ const DisplaySurveys = () => {
 				<div
 					className={`flex flex-col md:flex-row ${isCreateSurveyOpen && "blur-xl ease-in-out duration-100"}`}
 				>
-					<SubNavbar sub={sub} setSub={setSub} />
+					<SubNavbar
+						sub={sub}
+						cateogoies={categories}
+						setSub={setSub}
+						setOpen={setIsLogSheetOpen}
+					/>
 					<div className={`flex-1 p-6 `}>
 						<div className='flex flex-col items-center lg:flex-row lg:justify-center mb-5 gap-3'>
 							<div className='w-full lg:max-w-3xl'>
 								<h1 className='text-3xl text-white font-bold mb-6 text-center'>
-									{sub.charAt(0).toUpperCase() + sub.slice(1)}
-									Survey
+									{sub.charAt(0).toUpperCase() + sub.slice(1)} {"  "} Surveys
 								</h1>
 								<div className='flex flex-col gap-4'>
 									{surveys.map(survey => (
@@ -106,6 +123,19 @@ const DisplaySurveys = () => {
 					onClose={() => setIsCreateSurveyOpen(false)}
 				/>
 			</div>
+			{user ? (
+				<Logout
+					setIsOpen={setIsLogSheetOpen}
+					isOpen={isLogSheetOpen}
+					onClose={() => setIsLogSheetOpen(false)}
+				/>
+			) : (
+				<Login
+					setIsOpen={setIsLogSheetOpen}
+					isOpen={isLogSheetOpen}
+					onClose={() => setIsLogSheetOpen(false)}
+				/>
+			)}
 		</>
 	);
 };

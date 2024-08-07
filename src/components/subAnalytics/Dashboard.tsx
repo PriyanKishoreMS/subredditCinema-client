@@ -1,6 +1,9 @@
+import Login from "@/components/navbar/LoginSheet";
+import Logout from "@/components/navbar/LogoutSheet";
 import Heatmap from "@/components/subAnalytics/HeatMap";
 import RedditPosts from "@/components/subAnalytics/RedditPosts";
 import Users from "@/components/subAnalytics/Users";
+import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { BiSolidUpvote } from "react-icons/bi";
 import { LuSword } from "react-icons/lu";
@@ -11,11 +14,13 @@ const ipAddrPort = "http://localhost:3000";
 
 const Dashboard = () => {
 	const [sub, setSub] = useState("kollywood");
+	const [isLogSheetOpen, setIsLogSheetOpen] = useState(false);
+	const { user } = useAuth();
 
 	return (
 		<div className='min-h-screen'>
 			<div className='flex flex-col md:flex-row'>
-				<SubNavbar sub={sub} setSub={setSub} />
+				<SubNavbar sub={sub} setSub={setSub} setOpen={setIsLogSheetOpen} />
 				<div className='flex-1 p-6'>
 					<div className='flex flex-col items-center lg:flex-row lg:justify-center mb-5 gap-3'>
 						<Users
@@ -54,6 +59,19 @@ const Dashboard = () => {
 					</div>
 				</div>
 			</div>
+			{user ? (
+				<Logout
+					setIsOpen={setIsLogSheetOpen}
+					isOpen={isLogSheetOpen}
+					onClose={() => setIsLogSheetOpen(false)}
+				/>
+			) : (
+				<Login
+					isOpen={isLogSheetOpen}
+					setIsOpen={setIsLogSheetOpen}
+					onClose={() => setIsLogSheetOpen(false)}
+				/>
+			)}
 		</div>
 	);
 };

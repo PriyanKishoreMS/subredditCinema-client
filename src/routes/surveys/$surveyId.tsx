@@ -13,7 +13,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { IoIosArrowRoundBack } from "react-icons/io";
+import { IoIosArrowRoundBack, IoMdShare } from "react-icons/io";
 
 export const Route = createFileRoute("/surveys/$surveyId")({
 	component: SurveyPage,
@@ -59,12 +59,14 @@ const fetchSurveyInfo = async (surveyId: number): Promise<SurveyResponse> => {
 	if (!response.ok) {
 		throw new Error("Network response was not ok");
 	}
+	console.log;
 	return response.json();
 };
 
 function SurveyPage() {
 	const { surveyId } = Route.useParams();
 	const [answers, setAnswers] = useState<Answer[]>([]);
+	const [requiredNotAnswered, setRequiredNotAnswered] = useState(false);
 
 	const {
 		data: survey,
@@ -131,6 +133,11 @@ function SurveyPage() {
 		});
 	};
 
+	const handleShare = () => {
+		navigator.clipboard.writeText(window.location.href);
+		alert("Link copied to clipboard!");
+	};
+
 	const handleSubmit = () => {
 		const formattedAnswers = answers.flatMap(answer => {
 			if ("selected_option_ids" in answer) {
@@ -141,17 +148,38 @@ function SurveyPage() {
 			}
 			return [answer];
 		});
+
+		const requiredQuestions = survey.questions.filter(q => q.is_required);
+		const requiredNotAnswered = requiredQuestions.some(
+			q => !formattedAnswers.some(a => a.question_id === q.question_id)
+		);
+		setRequiredNotAnswered(requiredNotAnswered);
+
+		if (requiredNotAnswered) return;
+
 		console.log(formattedAnswers, "formattedAnswers");
 		submitMutation.mutate(formattedAnswers);
 	};
 
 	return (
 		<Card className='md:max-w-5xl mx-auto bg-gray-950/70 backdrop-blur-md border-gray-700 p-6'>
-			<Button size='icon' variant='outline' className='p-5 rounded-xl'>
-				<Link to='/surveys'>
-					<IoIosArrowRoundBack className='w-8 h-8 text-sky-500' />
-				</Link>
-			</Button>
+			<div className='flex items-center justify-between w-full'>
+				<Button size='icon' variant='outline' className='p-5 rounded-xl'>
+					<Link to='/surveys'>
+						<IoIosArrowRoundBack className='w-8 h-8 text-sky-500' />
+					</Link>
+				</Button>
+				<Button
+					size='icon'
+					variant='outline'
+					className='p-5 rounded-xl'
+					onClick={handleShare}
+				>
+					<p>
+						<IoMdShare className='w-6 h-6 text-sky-500' />
+					</p>
+				</Button>
+			</div>
 			<CardHeader>
 				<div className='flex items-start justify-between  mb-4'>
 					<div className='flex flex-col justify-center w-full items-center'>
@@ -159,7 +187,7 @@ function SurveyPage() {
 							{survey.title}
 						</CardTitle>
 						<CardDescription
-							className={`mb-8 w-full text-justify ${survey.description.length > 30 ? "text-justify" : "text-center"}`}
+							className={`mb-8 mt-2 w-full text-justify ${survey.description?.length > 30 ? "text-justify" : "text-center"}`}
 						>
 							{survey.description}
 						</CardDescription>
@@ -172,7 +200,12 @@ function SurveyPage() {
 					<div key={question.question_id} className='mb-8'>
 						<p className='font-semibold mb-4'>
 							{question.text}
-							{question.is_required && <span className='text-red-502'>*</span>}
+							{question.is_required && <span className='text-red-500'>*</span>}
+							{requiredNotAnswered && question.is_required && (
+								<p className='text-red-500 text-sm'>
+									This question is required
+								</p>
+							)}
 						</p>
 						{question.type === "text" && (
 							<Input
@@ -185,6 +218,7 @@ function SurveyPage() {
 								required={question.is_required}
 							/>
 						)}
+
 						{question.type === "single" && question.options && (
 							<RadioGroup
 								onValueChange={value =>
@@ -202,6 +236,7 @@ function SurveyPage() {
 										/>
 										<Label
 											htmlFor={`q${question.question_id}-o${option.option_id}`}
+											className='hover:text-slate-400 cursor-pointer'
 										>
 											{option.text}
 										</Label>
@@ -231,6 +266,7 @@ function SurveyPage() {
 										/>
 										<Label
 											htmlFor={`q${question.question_id}-o${option.option_id}`}
+											className='hover:text-slate-400 cursor-pointer'
 										>
 											{option.text}
 										</Label>
