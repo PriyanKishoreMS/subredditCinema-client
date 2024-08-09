@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useApi } from "@/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
@@ -52,17 +53,6 @@ type Answer = {
 	answer_text?: string;
 };
 
-const ipAddrPort = "http://localhost:3000";
-
-const fetchSurveyInfo = async (surveyId: number): Promise<SurveyResponse> => {
-	const response = await fetch(`${ipAddrPort}/api/survey/${surveyId}`);
-	if (!response.ok) {
-		throw new Error("Network response was not ok");
-	}
-	console.log;
-	return response.json();
-};
-
 function SurveyPage() {
 	const { surveyId } = Route.useParams();
 	const [answers, setAnswers] = useState<Answer[]>([]);
@@ -78,11 +68,24 @@ function SurveyPage() {
 	});
 
 	const queryClient = useQueryClient();
+	const { fetchWithToken } = useApi();
+
+	const fetchSurveyInfo = async (surveyId: number) => {
+		try {
+			const response = await fetchWithToken(`/api/survey/${surveyId}`);
+			if (!response.ok) {
+				throw new Error("Network response was not ok");
+			}
+			return response.json();
+		} catch (err) {
+			console.error(err);
+		}
+	};
 
 	const submitMutation = useMutation({
 		mutationFn: async (data: Answer[]) => {
-			const response = await fetch(
-				`${ipAddrPort}/api/survey/response/${surveyId}`,
+			const response = await fetchWithToken(
+				`/api/survey/response/${surveyId}`,
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
@@ -111,25 +114,32 @@ function SurveyPage() {
 		const question = survey.questions.find(q => q.question_id === questionId);
 		if (!question) return;
 
-		let answer: Answer;
-		if (question.type === "text") {
-			answer = { question_id: questionId, answer_text: value as string };
-		} else if (question.type === "single") {
-			answer = { question_id: questionId, selected_option_id: value as number };
-		} else {
-			answer = {
-				question_id: questionId,
-				selected_option_ids: value as number[],
-			};
-		}
-
 		setAnswers(prev => {
-			const index = prev.findIndex(a => a.question_id === questionId);
-			if (index !== -3) {
-				return [...prev.slice(-2, index), answer, ...prev.slice(index + 1)];
-			} else {
-				return [...prev, answer];
+			const otherAnswers = prev.filter(a => a.question_id !== questionId);
+
+			let newAnswers: Answer[];
+			switch (question.type) {
+				case "text":
+					newAnswers = [
+						{ question_id: questionId, answer_text: value as string },
+					];
+					break;
+				case "single":
+					newAnswers = [
+						{ question_id: questionId, selected_option_id: value as number },
+					];
+					break;
+				case "multiple":
+					newAnswers = (value as number[]).map(optionId => ({
+						question_id: questionId,
+						selected_option_id: optionId,
+					}));
+					break;
+				default:
+					newAnswers = [];
 			}
+
+			return [...otherAnswers, ...newAnswers];
 		});
 	};
 
@@ -139,26 +149,17 @@ function SurveyPage() {
 	};
 
 	const handleSubmit = () => {
-		const formattedAnswers = answers.flatMap(answer => {
-			if ("selected_option_ids" in answer) {
-				return answer.selected_option_ids!.map(id => ({
-					question_id: answer.question_id,
-					selected_option_id: id,
-				}));
-			}
-			return [answer];
-		});
-
 		const requiredQuestions = survey.questions.filter(q => q.is_required);
-		const requiredNotAnswered = requiredQuestions.some(
-			q => !formattedAnswers.some(a => a.question_id === q.question_id)
+		const requiredAnswered = requiredQuestions.every(q =>
+			answers.some(a => a.question_id === q.question_id)
 		);
-		setRequiredNotAnswered(requiredNotAnswered);
+		if (!requiredAnswered) {
+			setRequiredNotAnswered(true);
+			return;
+		}
 
-		if (requiredNotAnswered) return;
-
-		console.log(formattedAnswers, "formattedAnswers");
-		submitMutation.mutate(formattedAnswers);
+		console.log(answers, "answers");
+		submitMutation.mutate(answers);
 	};
 
 	return (
@@ -232,10 +233,10 @@ function SurveyPage() {
 									>
 										<RadioGroupItem
 											value={option.option_id.toString()}
-											id={`q${question.question_id}-o${option.option_id}`}
+											id={`${option.option_id}`}
 										/>
 										<Label
-											htmlFor={`q${question.question_id}-o${option.option_id}`}
+											htmlFor={`${option.option_id}`}
 											className='hover:text-slate-400 cursor-pointer'
 										>
 											{option.text}
@@ -252,20 +253,32 @@ function SurveyPage() {
 										className='flex items-center space-x-4'
 									>
 										<Checkbox
-											id={`q${question.question_id}-o${option.option_id}`}
+											id={`${option.option_id}`}
 											onCheckedChange={checked => {
-												const currentAnswer =
-													answers.find(
-														a => a.question_id === question.question_id
-													)?.selected_option_ids || [];
-												const newValue = checked
-													? [...currentAnswer, option.option_id]
-													: currentAnswer.filter(id => id !== option.option_id);
-												handleAnswerChange(question.question_id, newValue);
+												const currentAnswers = answers.filter(
+													a => a.question_id === question.question_id
+												);
+												const currentIds = currentAnswers.map(
+													a => a.selected_option_id!
+												);
+												let newIds: number[];
+												if (checked) {
+													newIds = [...currentIds, option.option_id];
+												} else {
+													newIds = currentIds.filter(
+														id => id !== option.option_id
+													);
+												}
+												handleAnswerChange(question.question_id, newIds);
 											}}
+											checked={answers.some(
+												a =>
+													a.question_id === question.question_id &&
+													a.selected_option_id === option.option_id
+											)}
 										/>
 										<Label
-											htmlFor={`q${question.question_id}-o${option.option_id}`}
+											htmlFor={`${option.option_id}`}
 											className='hover:text-slate-400 cursor-pointer'
 										>
 											{option.text}
