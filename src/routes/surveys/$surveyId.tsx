@@ -1,3 +1,5 @@
+import SurveyResults from "@/components/surveys/SurveyResults";
+import { Answer, SurveyResponse } from "@/components/surveys/types";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -20,48 +22,16 @@ export const Route = createFileRoute("/surveys/$surveyId")({
 	component: SurveyPage,
 });
 
-type SurveyResponse = {
-	id: number;
-	username: string;
-	avatar: string;
-	subreddit: string;
-	title: string;
-	description: string;
-	created_at: string;
-	end_time: string;
-	is_result_public: boolean;
-	total_responses: number;
-	questions: Array<{
-		question_id: number;
-		order: number;
-		text: string;
-		type: "single" | "multiple" | "text";
-		is_required: boolean;
-		options: Array<{
-			question_id: number;
-			option_id: number;
-			order: number;
-			text: string;
-		}> | null;
-	}>;
-};
-
-type Answer = {
-	question_id: number;
-	selected_option_id?: number;
-	selected_option_ids?: number[];
-	answer_text?: string;
-};
-
 function SurveyPage() {
 	const { surveyId } = Route.useParams();
 	const [answers, setAnswers] = useState<Answer[]>([]);
 	const [requiredNotAnswered, setRequiredNotAnswered] = useState(false);
+	const [showResults, setShowResults] = useState(false);
 
 	const {
 		data: survey,
-		isLoading,
-		isError,
+		isLoading: isLoadingQuestions,
+		isError: isErrorQuestions,
 	} = useQuery<SurveyResponse, Error>({
 		queryKey: ["survey", surveyId],
 		queryFn: () => fetchSurveyInfo(parseInt(surveyId)),
@@ -103,8 +73,8 @@ function SurveyPage() {
 		},
 	});
 
-	if (isLoading) return <div>Loading...</div>;
-	if (isError) return <div>Error loading survey</div>;
+	if (isLoadingQuestions) return <div>Loading...</div>;
+	if (isErrorQuestions) return <div>Error loading survey</div>;
 	if (!survey) return null;
 
 	const handleAnswerChange = (
@@ -170,16 +140,24 @@ function SurveyPage() {
 						<IoIosArrowRoundBack className='w-8 h-8 text-sky-500' />
 					</Link>
 				</Button>
-				<Button
-					size='icon'
-					variant='outline'
-					className='p-5 rounded-xl'
-					onClick={handleShare}
-				>
-					<p>
-						<IoMdShare className='w-6 h-6 text-sky-500' />
-					</p>
-				</Button>
+				<div className='items-center justify-center flex gap-3'>
+					<Button
+						variant='outline'
+						onClick={() => setShowResults(!showResults)}
+					>
+						{showResults ? "Hide Results" : "Show Results"}
+					</Button>
+					<Button
+						size='icon'
+						variant='outline'
+						className='p-5 rounded-xl'
+						onClick={handleShare}
+					>
+						<p>
+							<IoMdShare className='w-6 h-6 text-sky-500' />
+						</p>
+					</Button>
+				</div>
 			</div>
 			<CardHeader>
 				<div className='flex items-start justify-between  mb-4'>
@@ -198,97 +176,111 @@ function SurveyPage() {
 
 			<CardContent>
 				{survey.questions.map(question => (
-					<div key={question.question_id} className='mb-8'>
-						<p className='font-semibold mb-4'>
-							{question.text}
-							{question.is_required && <span className='text-red-500'>*</span>}
-							{requiredNotAnswered && question.is_required && (
-								<p className='text-red-500 text-sm'>
-									This question is required
-								</p>
-							)}
-						</p>
-						{question.type === "text" && (
-							<Input
-								placeholder='Type your answer here'
-								className='w-full border border-gray-500 bg-gray-800 rounded p-2'
-								type='text'
-								onChange={e =>
-									handleAnswerChange(question.question_id, e.target.value)
-								}
-								required={question.is_required}
-							/>
-						)}
+					<div key={question.question_id} className='mb-8 flex flex-wrap'>
+						<div className='w-full md:w-1/2 pr-4'>
+							<p className='font-semibold mb-4'>
+								{question.text}
+								{question.is_required && (
+									<span className='text-red-500'>*</span>
+								)}
+								{requiredNotAnswered && question.is_required && (
+									<p className='text-red-500 text-sm'>
+										This question is required
+									</p>
+								)}
+							</p>
+							{showResults ? (
+								<SurveyResults surveyID={survey.id} question={question} />
+							) : (
+								<>
+									{question.type === "text" && (
+										<Input
+											placeholder='Type your answer here'
+											className='w-full border border-gray-500 bg-gray-800 rounded p-2'
+											type='text'
+											onChange={e =>
+												handleAnswerChange(question.question_id, e.target.value)
+											}
+											required={question.is_required}
+										/>
+									)}
 
-						{question.type === "single" && question.options && (
-							<RadioGroup
-								onValueChange={value =>
-									handleAnswerChange(question.question_id, parseInt(value))
-								}
-							>
-								{question.options.map(option => (
-									<div
-										key={option.option_id}
-										className='flex items-center space-x-4'
-									>
-										<RadioGroupItem
-											value={option.option_id.toString()}
-											id={`${option.option_id}`}
-										/>
-										<Label
-											htmlFor={`${option.option_id}`}
-											className='hover:text-slate-400 cursor-pointer'
+									{question.type === "single" && question.options && (
+										<RadioGroup
+											onValueChange={value =>
+												handleAnswerChange(
+													question.question_id,
+													parseInt(value)
+												)
+											}
 										>
-											{option.text}
-										</Label>
-									</div>
-								))}
-							</RadioGroup>
-						)}
-						{question.type === "multiple" && question.options && (
-							<div className='space-y-4'>
-								{question.options.map(option => (
-									<div
-										key={option.option_id}
-										className='flex items-center space-x-4'
-									>
-										<Checkbox
-											id={`${option.option_id}`}
-											onCheckedChange={checked => {
-												const currentAnswers = answers.filter(
-													a => a.question_id === question.question_id
-												);
-												const currentIds = currentAnswers.map(
-													a => a.selected_option_id!
-												);
-												let newIds: number[];
-												if (checked) {
-													newIds = [...currentIds, option.option_id];
-												} else {
-													newIds = currentIds.filter(
-														id => id !== option.option_id
-													);
-												}
-												handleAnswerChange(question.question_id, newIds);
-											}}
-											checked={answers.some(
-												a =>
-													a.question_id === question.question_id &&
-													a.selected_option_id === option.option_id
-											)}
-										/>
-										<Label
-											htmlFor={`${option.option_id}`}
-											className='hover:text-slate-400 cursor-pointer'
-										>
-											{option.text}
-										</Label>
-									</div>
-								))}
-							</div>
-						)}
+											{question.options.map(option => (
+												<div
+													key={option.option_id}
+													className='flex items-center space-x-4'
+												>
+													<RadioGroupItem
+														value={option.option_id.toString()}
+														id={`${option.option_id}`}
+													/>
+													<Label
+														htmlFor={`${option.option_id}`}
+														className='hover:text-slate-400 cursor-pointer'
+													>
+														{option.text}
+													</Label>
+												</div>
+											))}
+										</RadioGroup>
+									)}
+									{question.type === "multiple" && question.options && (
+										<div className='space-y-4'>
+											{question.options.map(option => (
+												<div
+													key={option.option_id}
+													className='flex items-center space-x-4'
+												>
+													<Checkbox
+														id={`${option.option_id}`}
+														onCheckedChange={checked => {
+															const currentAnswers = answers.filter(
+																a => a.question_id === question.question_id
+															);
+															const currentIds = currentAnswers.map(
+																a => a.selected_option_id!
+															);
+															let newIds: number[];
+															if (checked) {
+																newIds = [...currentIds, option.option_id];
+															} else {
+																newIds = currentIds.filter(
+																	id => id !== option.option_id
+																);
+															}
+															handleAnswerChange(question.question_id, newIds);
+														}}
+														checked={answers.some(
+															a =>
+																a.question_id === question.question_id &&
+																a.selected_option_id === option.option_id
+														)}
+													/>
+													<Label
+														htmlFor={`${option.option_id}`}
+														className='hover:text-slate-400 cursor-pointer'
+													>
+														{option.text}
+													</Label>
+												</div>
+											))}
+										</div>
+									)}
+								</>
+							)}
+						</div>
 					</div>
 				))}
+
 				<Button onClick={handleSubmit} disabled={submitMutation.isPending}>
 					{submitMutation.isPending ? "Submitting..." : "Submit Survey"}
 				</Button>
