@@ -47,7 +47,8 @@ export const QuestionPieChart: React.FC<PieChartProps> = ({
 						data={data}
 						cx={100}
 						cy={100}
-						innerRadius={60}
+						innerRadius={50}
+						paddingAngle={0}
 						strokeWidth={0}
 						dataKey='count'
 						nameKey='text'
@@ -79,7 +80,7 @@ export const QuestionPieChart: React.FC<PieChartProps> = ({
 											<tspan
 												x={viewBox.cx}
 												y={(viewBox.cy || 0) + 24}
-												className='fill-muted-foreground'
+												className='fill-muted-foreground text-sm'
 											>
 												Responses
 											</tspan>

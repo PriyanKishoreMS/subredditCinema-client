@@ -40,10 +40,12 @@ const PostNewPoll = async (data: PollData) => {
 	return response.json();
 };
 
-const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
-	isOpen,
-	onClose,
-}) => {
+const CreatePollSheet: React.FC<{
+	isOpen: boolean;
+	onClose: () => void;
+	openLoginSheet: () => void;
+	signedIn: boolean;
+}> = ({ isOpen, onClose, openLoginSheet, signedIn }) => {
 	const [pollData, setPollData] = useState<PollData>({
 		reddit_uid: "",
 		subreddit: "",
@@ -56,6 +58,9 @@ const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 		voting_method: "single",
 		end_time: "",
 	});
+	const [selectedTimeFrame, setSelectedTimeFrame] = useState<string | null>(
+		null
+	);
 
 	const queryClient = useQueryClient();
 
@@ -82,6 +87,19 @@ const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 			alert("Failed to create poll");
 		},
 	});
+
+	const timeFrames = [
+		{ label: "12h", hours: 12 },
+		{ label: "1 day", hours: 24 },
+		{ label: "3 days", hours: 72 },
+		{ label: "1 week", hours: 168 },
+	];
+
+	const handleTimeFrameSelect = (label: string, hours: number) => {
+		const endTime = new Date(Date.now() + hours * 60 * 60 * 1000);
+		setPollData(prev => ({ ...prev, end_time: endTime.toISOString() }));
+		setSelectedTimeFrame(label);
+	};
 
 	const handleInputChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -115,15 +133,14 @@ const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		pollData.end_time = new Date(pollData.end_time).toISOString();
 		createPollMutation.mutate(pollData);
 	};
 
 	if (!isOpen) return null;
 
 	return (
-		<div className='fixed inset-0 bg-slate-700 bg-opacity-50 flex justify-center items-center'>
-			<Card className='bg-gray-900/95 border border-gray-700 backdrop-blur-md p-6 rounded-lg max-w-2xl w-full'>
+		<div className='fixed inset-0 bg-slate-700 backdrop-blur-xl bg-opacity-50 flex justify-center items-center'>
+			<Card className='bg-slate-950/80 backdrop-blur-md p-6 rounded-lg max-w-2xl w-full'>
 				<div className='flex justify-between items-center'>
 					<h2 className='text-2xl font-bold my-4 self-center'>
 						Create New Poll
@@ -138,7 +155,7 @@ const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 						<Cross1Icon className='w-4 h-4' />
 					</Button>
 				</div>
-				<form onSubmit={handleSubmit} className='space-y-4'>
+				<div className='space-y-4'>
 					<label className='block mb-1'>Select Subreddit</label>
 					<div className='flex flex-col items-strech'>
 						<div className='grid grid-cols-2 lg:grid-cols-4'>
@@ -171,7 +188,7 @@ const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 							value={pollData.title}
 							onChange={handleInputChange}
 							required
-							className='border border-gray-500 bg-gray-800 rounded'
+							className=' bg-slate-800 rounded'
 						/>
 					</div>
 
@@ -184,7 +201,7 @@ const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 							name='description'
 							value={pollData.description}
 							onChange={handleInputChange}
-							className='w-full border border-gray-500 rounded p-2 bg-gray-800'
+							className='w-full rounded p-2 bg-slate-800'
 							placeholder='Add a description'
 						/>
 					</div>
@@ -198,7 +215,7 @@ const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 									onChange={e => handleOptionChange(index, e.target.value)}
 									placeholder={`Option ${index + 1}`}
 									required
-									className='flex-grow border rounded border-gray-500 p-2 mr-2 bg-gray-800'
+									className='flex-grow  rounded  p-2 mr-2 bg-slate-800'
 								/>
 								<Button
 									type='button'
@@ -214,8 +231,8 @@ const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 						<Button
 							type='button'
 							onClick={addOption}
-							className='bg-blue-500/50 hover:bg-blue-500 text-white px-2 py-1 rounded'
-							variant='ghost'
+							className='px-2 py-1 rounded'
+							variant='default'
 							{...{ disabled: pollData.options.length >= 7 }}
 						>
 							Add Option
@@ -224,32 +241,38 @@ const CreatePollSheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
 					<div className='relative'>
 						<label htmlFor='end_time' className='block mb-1 text-white'>
-							End Time
+							Deadline
 						</label>
-						<input
-							id='end_time'
-							name='end_time'
-							type='datetime-local'
-							value={pollData.end_time}
-							onChange={handleInputChange}
-							required
-							className='w-full border rounded p-2 bg-gray-800 text-white border-gray-600'
-							style={{
-								colorScheme: "dark",
-							}}
-						/>
+						<div className='flex space-x-2'>
+							{timeFrames.map(frame => (
+								<Button
+									key={frame.label}
+									variant={
+										selectedTimeFrame === frame.label ? "default" : "outline"
+									}
+									onClick={() =>
+										handleTimeFrameSelect(frame.label, frame.hours)
+									}
+									className={`flex-1`}
+								>
+									{frame.label}
+								</Button>
+							))}
+						</div>
+						<input type='hidden' name='end_time' value={pollData.end_time} />
 					</div>
 
 					<div className='text-right'>
 						<Button
 							type='submit'
-							className='bg-green-500/50 hover:bg-green-500 text-white px-4 py-2 rounded'
-							variant='ghost'
+							className='bg-blue-500/70 hover:bg-blue-600 text-white px-4 py-2 rounded'
+							variant='default'
+							onClick={signedIn ? handleSubmit : openLoginSheet}
 						>
-							Create Poll
+							{signedIn ? "Create Poll" : "Verify to create poll"}
 						</Button>
 					</div>
-				</form>
+				</div>
 			</Card>
 		</div>
 	);

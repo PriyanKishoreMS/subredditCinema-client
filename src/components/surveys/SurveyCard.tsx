@@ -16,6 +16,8 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey }) => {
 	);
 
 	const endTimeValue = formatFutureTime(survey.end_time);
+	const fallbackAvatar = "./public/fallbacksnoovatar.png";
+
 	return (
 		<Card className='group hover:shadow-lg transition-all duration-300 bg-gray-900/70 backdrop-blur-md border-gray-700 overflow-hidden cursor-pointer hover:scale-[1.03]'>
 			{/* <div className='absolute inset-0 bg-gradient-to-b from-blue-600/20 to-purple-600/20 opacity-0 group-hover:opacity-30 transition-opacity duration-300' /> */}
@@ -23,7 +25,10 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey }) => {
 				<div className='flex justify-between items-center'>
 					<div className='flex items-center space-x-4'>
 						<Avatar>
-							<AvatarImage src={survey.avatar} alt={survey.username} />
+							<AvatarImage
+								src={survey.avatar || fallbackAvatar}
+								alt={survey.username}
+							/>
 							<AvatarFallback>{survey.username}</AvatarFallback>
 						</Avatar>
 						<div>

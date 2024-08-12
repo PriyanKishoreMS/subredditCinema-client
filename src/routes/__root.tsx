@@ -14,7 +14,7 @@ function RootRoute() {
 	const [isLogSheetOpen, setIsLogSheetOpen] = useState(false);
 	return (
 		<div
-			className='dark min-h-screen bg-cover bg-fixed bg-center bg-no-repeat'
+			className='dark min-h-screen bg-cover bg-fixed bg-center bg-no-repeat bg-gradient-to-br from-gray-900 via-blue-950 to-gray-950'
 			style={{ backgroundImage: 'url("/twbg2.jpg")' }}
 		>
 			<Navbar setOpen={setIsLogSheetOpen} />

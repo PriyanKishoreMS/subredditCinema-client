@@ -43,6 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	) => {
 		setAccessToken(tokens.accessToken);
 		setRefreshToken(tokens.refreshToken);
+		userData.avatar = userData.avatar || "./public/fallbacksnoovatar.png";
 		setUser(userData);
 		localStorage.setItem("username", userData.username);
 		localStorage.setItem("avatar", userData.avatar);

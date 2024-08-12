@@ -102,7 +102,18 @@ const Heatmap: React.FC<{
 				<div className='flex flex-col justify-center items-center lg:flex-row'>
 					{hours.map(hour => (
 						<div key={hour} className='flex lg:flex-col'>
-							<div className='w-7 h-7 mr-2 text-center text-xs'>{hour}</div>
+							<div className='w-7 h-7 mr-2 text-start text-xs'>
+								{hour % 2 == 0 ? (
+									<div className='flex flex-row'>
+										<p className=' font-bold'>
+											{hour % 12 == 0 ? "12" : hour % 12}
+										</p>
+										<p className='text-gray-300'>{hour < 12 ? "am" : "pm"}</p>
+									</div>
+								) : (
+									""
+								)}
+							</div>
 							{days.map(day => {
 								const value = frequencyData[day]?.[hour] ?? 0;
 								return (
@@ -149,8 +160,13 @@ const Heatmap: React.FC<{
 							size={22}
 							className='self-center mr-2 text-orange-500'
 						/>
-						<span className='text-orange-500'>r/{sub} </span>
-						Frequency <span className='bg-red-500 px-1'>Heatmap</span>
+						<div>
+							<span className='text-orange-500'>r/{sub}</span>
+							<span>
+								{"  "}Frequency {"  "}
+							</span>
+							<span className='bg-red-500'>Heatmap</span>
+						</div>
 					</span>
 				</CardTitle>
 				<CardDescription className='mb-4'>

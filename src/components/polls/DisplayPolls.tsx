@@ -3,45 +3,16 @@ import Logout from "@/components/navbar/LogoutSheet";
 import SubNavbar from "@/components/navbar/SubNavbar";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useApi } from "@/utils";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { FaChevronLeft } from "react-icons/fa6";
 import { Skeleton } from "../ui/skeleton";
 import CreatePollSheet from "./CreatePollSheet";
 import PollCard from "./PollCard";
 import { PollsResponse } from "./types";
-
-const ipAddrPort = "http://localhost:3000";
-
-const fetchPolls = async (
-	page: number,
-	sub: string
-): Promise<PollsResponse> => {
-	const response = await fetch(
-		`${ipAddrPort}/api/poll/${sub}/all?page=${page}`
-	);
-	if (!response.ok) {
-		throw new Error("Network response was not ok");
-	}
-	return response.json();
-};
-
-const PostVote = async (pollId: string, optionId: string) => {
-	try {
-		const response = await fetch(
-			`${ipAddrPort}/api/poll/vote/${pollId}/${optionId}`,
-			{
-				method: "POST",
-			}
-		);
-		const res = await response.json();
-		return res;
-	} catch (error) {
-		console.error(error, "error here");
-	}
-};
 
 const PollsSkeleton: React.FC<{ state: string }> = ({ state }) => {
 	return (
@@ -68,6 +39,42 @@ const DisplayPolls = () => {
 	const [isCreatePollOpen, setIsCreatePollOpen] = useState(false);
 	const [isLogSheetOpen, setIsLogSheetOpen] = useState(false);
 	const { user } = useAuth();
+	const [signedIn, setSignedIn] = useState(user !== null);
+	const { fetchWithToken } = useApi();
+
+	useEffect(() => {
+		setSignedIn(user !== null);
+	}, [user]);
+
+	const OpenLoginSheet = () => {
+		setIsLogSheetOpen(true);
+	};
+
+	const fetchPolls = async (
+		page: number,
+		sub: string
+	): Promise<PollsResponse> => {
+		const response = await fetchWithToken(`/api/poll/${sub}/all?page=${page}`);
+		if (!response.ok) {
+			throw new Error("Network response was not ok");
+		}
+		return response.json();
+	};
+
+	const PostVote = async (pollId: string, optionId: string) => {
+		try {
+			const response = await fetchWithToken(
+				`/api/poll/vote/${pollId}/${optionId}`,
+				{
+					method: "POST",
+				}
+			);
+			const res = await response.json();
+			return res;
+		} catch (error) {
+			console.error(error, "error here");
+		}
+	};
 
 	const { data, isLoading, isError } = useQuery<PollsResponse, Error>({
 		queryKey: ["polls", page, sub],
@@ -96,9 +103,7 @@ const DisplayPolls = () => {
 	return (
 		<>
 			<div className='min-h-screen'>
-				<div
-					className={`flex flex-col md:flex-row ${isCreatePollOpen && "blur-xl ease-in-out duration-100"}`}
-				>
+				<div className={`flex flex-col md:flex-row`}>
 					<SubNavbar sub={sub} setSub={setSub} setOpen={setIsLogSheetOpen} />
 					<div className={`flex-1 p-6 `}>
 						<div className='flex flex-col items-center lg:flex-row lg:justify-center mb-5 gap-3'>
@@ -117,6 +122,8 @@ const DisplayPolls = () => {
 											key={poll.id}
 											poll={poll}
 											addVoteMutation={addVoteMutation}
+											signedIn={signedIn}
+											onClick={OpenLoginSheet}
 										/>
 									))}
 								</div>
@@ -164,6 +171,8 @@ const DisplayPolls = () => {
 				</div>
 				<CreatePollSheet
 					isOpen={isCreatePollOpen}
+					openLoginSheet={OpenLoginSheet}
+					signedIn={signedIn}
 					onClose={() => setIsCreatePollOpen(false)}
 				/>
 			</div>

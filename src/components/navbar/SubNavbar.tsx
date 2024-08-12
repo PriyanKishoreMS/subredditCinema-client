@@ -33,7 +33,7 @@ const SubNavbar: React.FC<{
 									: "text-gray-300 hover:bg-gray-700"
 							}`}
 						>
-							{cat !== "all" && "/r"}
+							{cat !== "all" && "r/"}
 							{cat}
 						</button>
 					))}
@@ -42,7 +42,7 @@ const SubNavbar: React.FC<{
 					{user ? (
 						<Button
 							variant='secondary'
-							className='hidden md:flex m-5 h-10 items-center'
+							className='hidden md:flex m-5 h-10 items-center justify-stretch gap-2'
 							onClick={() => setOpen(true)}
 						>
 							<Avatar>
@@ -54,11 +54,14 @@ const SubNavbar: React.FC<{
 					) : (
 						<Button
 							size='lg'
-							variant='default'
-							className='hidden md:flex m-5 bg-orange-600 hover:bg-orange-700 text-white items-center'
+							variant='secondary'
+							className='hidden md:flex m-5 text-white items-center'
 							onClick={() => setOpen(true)}
 						>
-							<FaRedditAlien size={20} className='mr-2 self-center' />
+							<FaRedditAlien
+								size={20}
+								className='mr-2 self-center text-orange-500'
+							/>
 							<h1 className='text-lg font-bold'>Verify</h1>
 						</Button>
 					)}

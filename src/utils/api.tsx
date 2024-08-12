@@ -6,6 +6,10 @@ export const useApi = () => {
 	const { accessToken, refreshToken, logout } = useAuth();
 
 	const fetchWithToken = async (url: string, options: RequestInit = {}) => {
+		if (!accessToken) {
+			return fetchWithoutToken(url, options);
+		}
+
 		const headers = new Headers(options.headers);
 		headers.set("Authorization", `Bearer ${accessToken}`);
 

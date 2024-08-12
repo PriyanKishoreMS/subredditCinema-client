@@ -11,10 +11,13 @@ import { CardTitle } from "../ui/card";
 
 const Navbar: React.FC<{
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ setOpen }) => {
+}> = ({ setOpen: setLoginSheetOpen }) => {
 	const [scrolled, setScrolled] = useState<boolean>(false);
+	const [sideSheetOpen, setSideSheetOpen] = useState(false);
 
 	const { user } = useAuth();
+
+	const closeSideSheet = () => setSideSheetOpen(false);
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -46,29 +49,49 @@ const Navbar: React.FC<{
 						<NavLink to='/polls' text='Polls' />
 						<NavLink to='/surveys' text='Surveys' />
 					</div>
-					<Sheet>
+					<Sheet open={sideSheetOpen} onOpenChange={setSideSheetOpen}>
 						<SheetTrigger asChild className='md:hidden'>
 							<button className='p-2 text-white hover:text-orange-500 transition-colors'>
 								<RxHamburgerMenu className='h-6 w-6' />
 							</button>
 						</SheetTrigger>
+
 						<SheetContent
 							side='right'
 							className='w-[300px] bg-gray-900 bg-opacity-50 backdrop-blur-md border-none sm:w-[400px]'
 						>
 							<nav className='flex flex-col justify-between h-full'>
 								<div className='flex flex-col space-y-4 mt-8'>
-									<MobileNavItem to='/' text='Home' />
-									<MobileNavItem to='/tiermaker' text='Tiermaker' />
-									<MobileNavItem to='/polls' text='Polls' />
-									<MobileNavItem to='/surveys' text='Surveys' />
-									<MobileNavItem to='/memerepo' text='Meme Repo' />
+									<MobileNavItem to='/' text='Home' onClick={closeSideSheet} />
+									<MobileNavItem
+										to='/tiermaker'
+										text='Tiermaker'
+										onClick={closeSideSheet}
+									/>
+									<MobileNavItem
+										to='/polls'
+										text='Polls'
+										onClick={closeSideSheet}
+									/>
+									<MobileNavItem
+										to='/surveys'
+										text='Surveys'
+										onClick={closeSideSheet}
+									/>
+									<MobileNavItem
+										to='/memerepo'
+										text='Meme Repo'
+										onClick={closeSideSheet}
+									/>
 								</div>
 								{user ? (
 									<Button
 										variant='default'
 										className='flex md:hidden m-5 items-center'
-										onClick={() => setOpen(true)}
+										onClick={() => {
+											setSideSheetOpen(false);
+											setLoginSheetOpen(true);
+										}}
 									>
 										<Avatar>
 											<AvatarImage src={user.avatar} alt={user.username} />
@@ -80,10 +103,16 @@ const Navbar: React.FC<{
 									<Button
 										size='lg'
 										variant='default'
-										className='flex md:hidden m-5 bg-orange-600 hover:bg-orange-700 text-white items-center'
-										onClick={() => setOpen(true)}
+										className='flex md:hidden m-5 text-white items-center'
+										onClick={() => {
+											setSideSheetOpen(false);
+											setLoginSheetOpen(true);
+										}}
 									>
-										<FaRedditAlien size={20} className='mr-2 self-center' />
+										<FaRedditAlien
+											size={20}
+											className='mr-2 self-center text-orange-500'
+										/>
 										<h1 className='text-lg font-bold'>Verify</h1>
 									</Button>
 								)}
@@ -100,6 +129,7 @@ interface NavItemProps {
 	to: string;
 	icon?: React.ReactNode;
 	text: string;
+	onClick?: () => void;
 }
 
 const NavLink: React.FC<NavItemProps> = ({ to, text }) => {
@@ -120,7 +150,7 @@ const NavLink: React.FC<NavItemProps> = ({ to, text }) => {
 	);
 };
 
-const MobileNavItem: React.FC<NavItemProps> = ({ to, text }) => {
+const MobileNavItem: React.FC<NavItemProps> = ({ to, text, onClick }) => {
 	const router = useRouter();
 	const isActive = router.state.location.pathname === to;
 
@@ -132,6 +162,7 @@ const MobileNavItem: React.FC<NavItemProps> = ({ to, text }) => {
 			} px-3 py-1 rounded-full text-white mr-5 transition-colors duration-200`}
 			tabIndex={isActive ? 0 : undefined}
 			autoFocus={isActive}
+			onClick={onClick}
 		>
 			<span className='text-md font-medium'>{text}</span>
 		</Link>

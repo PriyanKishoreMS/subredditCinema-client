@@ -31,7 +31,7 @@ const SurveyResults: React.FC<{
 	} = useSurveyResults(Number(surveyID));
 
 	return (
-		<>
+		<div>
 			{surveyResults && surveyResults.results[question.question_id] && (
 				<QuestionPieChart
 					data={surveyResults.results[question.question_id].result_count.map(
@@ -48,7 +48,7 @@ const SurveyResults: React.FC<{
 					}
 				/>
 			)}
-		</>
+		</div>
 	);
 };
 

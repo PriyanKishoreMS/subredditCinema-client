@@ -33,6 +33,7 @@ export type SurveyResponse = {
 	end_time: string;
 	is_result_public: boolean;
 	total_responses: number;
+	is_responded?: boolean;
 	questions: Array<{
 		question_id: number;
 		order: number;

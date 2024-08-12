@@ -40,10 +40,12 @@ const ipAddrPort = "http://localhost:3000";
 const subreddits = ["kollywood", "tollywood", "bollywood", "MalayalamMovies"];
 const questionTypes = ["text", "single", "multiple"];
 
-const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
-	isOpen,
-	onClose,
-}) => {
+const CreateSurveySheet: React.FC<{
+	isOpen: boolean;
+	onClose: () => void;
+	openLoginSheet: () => void;
+	signedIn: boolean;
+}> = ({ isOpen, onClose, openLoginSheet, signedIn }) => {
 	const [surveyData, setSurveyData] = useState<SurveyData>({
 		subreddit: "",
 		title: "",
@@ -51,6 +53,9 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 		questions: [],
 		end_time: "",
 	});
+	const [selectedTimeFrame, setSelectedTimeFrame] = useState<string | null>(
+		null
+	);
 
 	const queryClient = useQueryClient();
 
@@ -90,6 +95,19 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 	) => {
 		const { name, value } = e.target;
 		setSurveyData(prev => ({ ...prev, [name]: value }));
+	};
+
+	const timeFrames = [
+		{ label: "1 day", hours: 24 },
+		{ label: "3 days", hours: 72 },
+		{ label: "1 week", hours: 168 },
+		{ label: "2 weeks", hours: 336 },
+	];
+
+	const handleTimeFrameSelect = (label: string, hours: number) => {
+		const endTime = new Date(Date.now() + hours * 60 * 60 * 1000);
+		setSurveyData(prev => ({ ...prev, end_time: endTime.toISOString() }));
+		setSelectedTimeFrame(label);
 	};
 
 	const addQuestion = () => {
@@ -184,20 +202,22 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		surveyData.end_time = new Date(surveyData.end_time).toISOString();
-		console.log(surveyData, "surveyData");
+		if (surveyData.questions.length === 0) {
+			alert("Add at least one question");
+			return;
+		}
 		createSurveyMutation.mutate(surveyData);
 	};
 
 	if (!isOpen) return null;
 
 	return (
-		<div className='fixed inset-0 bg-slate-700 bg-opacity-50 flex justify-center items-center'>
+		<div className='fixed inset-0 bg-slate-700 backdrop-blur-xl bg-opacity-50 flex justify-center items-center'>
 			<Card
-				className='bg-gray-900/95 border border-gray-700 backdrop-blur-md rounded-lg w-full max-w-4xl m-4 flex flex-col'
+				className='bg-slate-950/80  backdrop-blur-md rounded-lg w-full max-w-4xl m-4 flex flex-col'
 				style={{ height: "85vh" }}
 			>
-				<div className='border-b border-gray-500 flex justify-between items-center'>
+				<div className='border-b border-slate-700 flex justify-between items-center'>
 					<h2 className='text-2xl font-bold p-6'>Create New Survey</h2>
 					<Button
 						variant='ghost'
@@ -210,7 +230,7 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
 				<div className='overflow-y-auto flex-grow p-6'>
 					<form onSubmit={handleSubmit} className='space-y-6'>
-						<div className='bg-gray-800 p-6 rounded-lg shadow-md'>
+						<div className='bg-slate-800 p-6 rounded-lg shadow-md'>
 							<label className='text-lg font-semibold block mb-4'>
 								Select Subreddit
 							</label>
@@ -245,7 +265,7 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 								value={surveyData.title}
 								onChange={handleInputChange}
 								required
-								className='w-full bg-gray-800 rounded-lg p-2'
+								className='w-full bg-slate-800 rounded-lg p-2'
 							/>
 						</div>
 
@@ -259,7 +279,7 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 								placeholder="What's your survey about?"
 								value={surveyData.description}
 								onChange={handleInputChange}
-								className='w-full bg-gray-800 rounded-lg p-2'
+								className='w-full bg-slate-800 rounded-lg p-2'
 							/>
 						</div>
 
@@ -268,7 +288,7 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 							{surveyData.questions.map((question, qIndex) => (
 								<div
 									key={question.order}
-									className='bg-gray-800 p-6 rounded-lg shadow-md'
+									className='bg-slate-800 p-6 rounded-lg shadow-md'
 								>
 									<div className='flex items-center justify-between mb-4'>
 										<span className='text-xl font-medium'>
@@ -290,7 +310,7 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 										}
 										placeholder='Question text'
 										required
-										className='w-full border bg-gray-700 rounded-lg p-3 mb-4'
+										className='w-full bg-slate-700 rounded-lg p-3 mb-4'
 									/>
 									<div className='flex items-center justify-between mb-4'>
 										<Select
@@ -299,10 +319,10 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 												updateQuestion(qIndex, "type", value)
 											}
 										>
-											<SelectTrigger className='w-[180px] bg-gray-700'>
+											<SelectTrigger className='w-[180px] bg-slate-700'>
 												<SelectValue placeholder='Type' />
 											</SelectTrigger>
-											<SelectContent className='bg-gray-800'>
+											<SelectContent className='bg-slate-800'>
 												{questionTypes.map(type => (
 													<SelectItem
 														className='text-white '
@@ -345,7 +365,7 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 														}
 														placeholder={`Option ${oIndex + 1}`}
 														required
-														className='w-80 border bg-gray-700 rounded-lg p-3 mb-4'
+														className='w-80 bg-slate-700 rounded-lg p-3 mb-4'
 													/>
 													<Button
 														type='button'
@@ -382,30 +402,41 @@ const CreateSurveySheet: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
 						<div className='relative'>
 							<label htmlFor='end_time' className='block mb-1 text-white'>
-								End Time
+								Deadline
 							</label>
+							<div className='flex space-x-2'>
+								{timeFrames.map(frame => (
+									<Button
+										type='button'
+										key={frame.label}
+										variant={
+											selectedTimeFrame === frame.label ? "default" : "outline"
+										}
+										size='default'
+										onClick={() =>
+											handleTimeFrameSelect(frame.label, frame.hours)
+										}
+										className={`flex-1`}
+									>
+										{frame.label}
+									</Button>
+								))}
+							</div>
 							<input
-								id='end_time'
+								type='hidden'
 								name='end_time'
-								type='datetime-local'
 								value={surveyData.end_time}
-								onChange={handleInputChange}
-								required
-								className='w-full border rounded p-2 bg-gray-800 text-white border-gray-600'
-								style={{
-									colorScheme: "dark",
-								}}
 							/>
 						</div>
 					</form>
 				</div>
-				<div className='border-t border-gray-500 p-6 flex justify-end'>
-					<button
-						onClick={handleSubmit}
-						className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600'
+				<div className='border-t border-slate-700 p-6 flex justify-end'>
+					<Button
+						className='bg-blue-500/70 hover:bg-blue-600 text-white px-4 py-2 rounded'
+						onClick={signedIn ? handleSubmit : openLoginSheet}
 					>
-						Create Survey
-					</button>
+						{signedIn ? "Create Survey" : "Verify to create survey"}
+					</Button>
 				</div>
 			</Card>
 		</div>

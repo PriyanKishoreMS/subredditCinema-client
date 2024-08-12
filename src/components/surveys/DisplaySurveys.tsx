@@ -3,7 +3,7 @@ import { useApi } from "@/utils";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { FaChevronLeft } from "react-icons/fa6";
 import Login from "../navbar/LoginSheet";
@@ -20,6 +20,16 @@ const DisplaySurveys = () => {
 	const [isCreateSurveyOpen, setIsCreateSurveyOpen] = useState(false);
 	const [isLogSheetOpen, setIsLogSheetOpen] = useState(false);
 	const { user } = useAuth();
+
+	const [signedIn, setSignedIn] = useState(user !== null);
+
+	useEffect(() => {
+		setSignedIn(user !== null);
+	}, [user]);
+
+	const OpenLoginSheet = () => {
+		setIsLogSheetOpen(true);
+	};
 
 	const { fetchWithoutToken } = useApi();
 	const categories = [
@@ -49,9 +59,7 @@ const DisplaySurveys = () => {
 	return (
 		<>
 			<div className='min-h-screen'>
-				<div
-					className={`flex flex-col md:flex-row ${isCreateSurveyOpen && "blur-xl ease-in-out duration-100"}`}
-				>
+				<div className={`flex flex-col md:flex-row`}>
 					<SubNavbar
 						sub={sub}
 						cateogoies={categories}
@@ -121,6 +129,8 @@ const DisplaySurveys = () => {
 				<CreateSurveySheet
 					isOpen={isCreateSurveyOpen}
 					onClose={() => setIsCreateSurveyOpen(false)}
+					signedIn={signedIn}
+					openLoginSheet={OpenLoginSheet}
 				/>
 			</div>
 			{user ? (
