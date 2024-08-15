@@ -10,9 +10,29 @@ import Login from "../navbar/LoginSheet";
 import Logout from "../navbar/LogoutSheet";
 import SubNavbar from "../navbar/SubNavbar";
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 import CreateSurveySheet from "./CreateSurveySheet";
 import SurveyCard from "./SurveyCard";
 import { SurveysResponse } from "./types";
+
+const SurveySkeleton: React.FC<{ state: string }> = ({ state }) => {
+	return (
+		<div className='flex flex-col'>
+			<Skeleton className='flex flex-col items-start p-5 w-full h-[250px] shadow-lg'>
+				<div className='flex justify-start w-full space-x-5 items-center'>
+					<Skeleton className='w-11 h-10 rounded-full' />
+					<div className='flex flex-col w-full gap-3'>
+						<Skeleton className='w-full h-5 rounded-xl' />
+						<Skeleton className='w-3/4 h-5 rounded-xl' />
+					</div>
+				</div>
+				<Skeleton className='h-full p-5 mt-5  w-full '>
+					<h1 className='text-xl text-gray-500'>{state}</h1>
+				</Skeleton>
+			</Skeleton>
+		</div>
+	);
+};
 
 const DisplaySurveys = () => {
 	const [sub, setSub] = useState("all");
@@ -40,7 +60,7 @@ const DisplaySurveys = () => {
 		"bollywood",
 	];
 
-	const { data, isLoading, isError, error } = useQuery<SurveysResponse, Error>({
+	const { data, isLoading, isError } = useQuery<SurveysResponse, Error>({
 		queryKey: ["surveys", page, sub],
 		queryFn: async () => {
 			const response = await fetchWithoutToken(
@@ -73,6 +93,11 @@ const DisplaySurveys = () => {
 									{sub.charAt(0).toUpperCase() + sub.slice(1)} {"  "} Surveys
 								</h1>
 								<div className='flex flex-col gap-4'>
+									{isLoading &&
+										Array.from({ length: 5 }).map((_, i) => (
+											<SurveySkeleton key={i} state='Loading...' />
+										))}{" "}
+									{isError && <SurveySkeleton state={"Error..."} />}
 									{surveys.map(survey => (
 										<Link
 											key={survey.id}

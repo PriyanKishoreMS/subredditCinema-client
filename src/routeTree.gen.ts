@@ -11,18 +11,15 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as TiermakerImport } from './routes/tiermaker'
 import { Route as PollsImport } from './routes/polls'
 import { Route as IndexImport } from './routes/index'
+import { Route as TierlistIndexImport } from './routes/tierlist/index'
 import { Route as SurveysIndexImport } from './routes/surveys/index'
+import { Route as TierlistTiermakerImport } from './routes/tierlist/tiermaker'
+import { Route as TierlistTierlistIdImport } from './routes/tierlist/$tierlistId'
 import { Route as SurveysSurveyIdImport } from './routes/surveys/$surveyId'
 
 // Create/Update Routes
-
-const TiermakerRoute = TiermakerImport.update({
-  path: '/tiermaker',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const PollsRoute = PollsImport.update({
   path: '/polls',
@@ -34,8 +31,23 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const TierlistIndexRoute = TierlistIndexImport.update({
+  path: '/tierlist/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const SurveysIndexRoute = SurveysIndexImport.update({
   path: '/surveys/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TierlistTiermakerRoute = TierlistTiermakerImport.update({
+  path: '/tierlist/tiermaker',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TierlistTierlistIdRoute = TierlistTierlistIdImport.update({
+  path: '/tierlist/$tierlistId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -62,13 +74,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PollsImport
       parentRoute: typeof rootRoute
     }
-    '/tiermaker': {
-      id: '/tiermaker'
-      path: '/tiermaker'
-      fullPath: '/tiermaker'
-      preLoaderRoute: typeof TiermakerImport
-      parentRoute: typeof rootRoute
-    }
     '/surveys/$surveyId': {
       id: '/surveys/$surveyId'
       path: '/surveys/$surveyId'
@@ -76,11 +81,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SurveysSurveyIdImport
       parentRoute: typeof rootRoute
     }
+    '/tierlist/$tierlistId': {
+      id: '/tierlist/$tierlistId'
+      path: '/tierlist/$tierlistId'
+      fullPath: '/tierlist/$tierlistId'
+      preLoaderRoute: typeof TierlistTierlistIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/tierlist/tiermaker': {
+      id: '/tierlist/tiermaker'
+      path: '/tierlist/tiermaker'
+      fullPath: '/tierlist/tiermaker'
+      preLoaderRoute: typeof TierlistTiermakerImport
+      parentRoute: typeof rootRoute
+    }
     '/surveys/': {
       id: '/surveys/'
       path: '/surveys'
       fullPath: '/surveys'
       preLoaderRoute: typeof SurveysIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/tierlist/': {
+      id: '/tierlist/'
+      path: '/tierlist'
+      fullPath: '/tierlist'
+      preLoaderRoute: typeof TierlistIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -91,9 +117,11 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
   PollsRoute,
-  TiermakerRoute,
   SurveysSurveyIdRoute,
+  TierlistTierlistIdRoute,
+  TierlistTiermakerRoute,
   SurveysIndexRoute,
+  TierlistIndexRoute,
 })
 
 /* prettier-ignore-end */
@@ -106,9 +134,11 @@ export const routeTree = rootRoute.addChildren({
       "children": [
         "/",
         "/polls",
-        "/tiermaker",
         "/surveys/$surveyId",
-        "/surveys/"
+        "/tierlist/$tierlistId",
+        "/tierlist/tiermaker",
+        "/surveys/",
+        "/tierlist/"
       ]
     },
     "/": {
@@ -117,14 +147,20 @@ export const routeTree = rootRoute.addChildren({
     "/polls": {
       "filePath": "polls.tsx"
     },
-    "/tiermaker": {
-      "filePath": "tiermaker.tsx"
-    },
     "/surveys/$surveyId": {
       "filePath": "surveys/$surveyId.tsx"
     },
+    "/tierlist/$tierlistId": {
+      "filePath": "tierlist/$tierlistId.tsx"
+    },
+    "/tierlist/tiermaker": {
+      "filePath": "tierlist/tiermaker.tsx"
+    },
     "/surveys/": {
       "filePath": "surveys/index.tsx"
+    },
+    "/tierlist/": {
+      "filePath": "tierlist/index.tsx"
     }
   }
 }

@@ -52,8 +52,6 @@ const Search: React.FC<SearchProps> = ({
 		onSearch();
 	};
 
-	console.log(searchResults, "searchResults");
-
 	return (
 		<div className='lg:w-64 w-full bg-gray-800 bg-opacity-50 border-[0.5px] border-gray-500 backdrop-blur-md p-4 flex flex-col h-[750px] rounded-lg shadow-lg'>
 			<div className='mb-4'>

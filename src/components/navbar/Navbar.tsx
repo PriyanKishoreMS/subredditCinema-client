@@ -45,7 +45,7 @@ const Navbar: React.FC<{
 					</Link>
 					<div className='hidden md:flex items-center'>
 						<NavLink to='/' text='Home' />
-						<NavLink to='/tiermaker' text='Tiermaker' />
+						<NavLink to='/tierlist' text='Tierlist' />
 						<NavLink to='/polls' text='Polls' />
 						<NavLink to='/surveys' text='Surveys' />
 					</div>
@@ -64,8 +64,8 @@ const Navbar: React.FC<{
 								<div className='flex flex-col space-y-4 mt-8'>
 									<MobileNavItem to='/' text='Home' onClick={closeSideSheet} />
 									<MobileNavItem
-										to='/tiermaker'
-										text='Tiermaker'
+										to='/tierlist'
+										text='Tierlist'
 										onClick={closeSideSheet}
 									/>
 									<MobileNavItem

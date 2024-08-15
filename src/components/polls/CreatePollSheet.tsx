@@ -18,7 +18,6 @@ type PollData = {
 	title: string;
 	description: string;
 	options: PollOption[];
-	voting_method: string;
 	end_time: string;
 };
 
@@ -55,7 +54,6 @@ const CreatePollSheet: React.FC<{
 			{ id: 1, text: "" },
 			{ id: 2, text: "" },
 		],
-		voting_method: "single",
 		end_time: "",
 	});
 	const [selectedTimeFrame, setSelectedTimeFrame] = useState<string | null>(
@@ -79,9 +77,9 @@ const CreatePollSheet: React.FC<{
 					{ id: 1, text: "" },
 					{ id: 2, text: "" },
 				],
-				voting_method: "single",
 				end_time: "",
 			});
+			setSelectedTimeFrame(null);
 		},
 		onError: () => {
 			alert("Failed to create poll");
@@ -246,6 +244,7 @@ const CreatePollSheet: React.FC<{
 						<div className='flex space-x-2'>
 							{timeFrames.map(frame => (
 								<Button
+									type='button'
 									key={frame.label}
 									variant={
 										selectedTimeFrame === frame.label ? "default" : "outline"

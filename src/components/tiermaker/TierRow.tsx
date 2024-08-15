@@ -1,10 +1,10 @@
+import { Image } from "@/components/tiermaker/types";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import React, { useEffect, useState } from "react";
 import { FaDeleteLeft } from "react-icons/fa6";
 import { HiOutlineColorSwatch } from "react-icons/hi";
 import { DraggableImage } from "./DraggableImage";
-import { Image } from "./TierList";
 
 interface TierRowProps {
 	tier: {
@@ -54,34 +54,31 @@ export const TierRow: React.FC<TierRowProps> = ({
 		setShowColorPicker(false);
 	};
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setLocalTierName(e.target.value);
-	};
-
-	const handleInputBlur = () => {
-		if (localTierName !== tier.name) {
-			onTierNameChange(tier.id, localTierName);
-		}
+	const handleInputChange = (e: React.FocusEvent<HTMLSpanElement>) => {
+		const newName = e.currentTarget.textContent || "";
+		setLocalTierName(newName);
+		onTierNameChange(tier.id, newName);
 	};
 
 	return (
 		<div className='flex mb-2 items-center justify-center'>
 			<div
-				className={`flex-shrink-0 lg:w-20 h-20 w-10 mr-2 rounded-md ${tier.color} relative`}
+				className={`flex-shrink-0 lg:w-20 h-20  w-10 mr-2 rounded-md ${tier.color} relative`}
 			>
-				<div
-					contentEditable
-					suppressContentEditableWarning
-					onInput={handleInputChange}
-					onBlur={handleInputBlur}
-					className='w-full h-20 flex items-center justify-center font-medium text-l bg-transparent text-black border-none text-center overflow-hidden p-2 break-all whitespace-pre-wrap'
+				<span
+					role='textbox'
+					contentEditable={true}
+					suppressContentEditableWarning={true}
+					onBlur={e => handleInputChange(e)}
+					style={{ whiteSpace: "pre-wrap" }}
+					className='w-full h-full flex flex-grow items-center justify-center font-medium text-l bg-transparent text-black border-none text-center overflow-hidden p-2 whitespace-pre-wrap'
 				>
 					{localTierName}
-				</div>
+				</span>
 			</div>
 			<div
 				ref={setNodeRef}
-				className={`flex-1 bg-opacity-50 rounded-md flex items-center space-x-2 p-2 min-h-[5rem] backdrop-blur-md bg-gray-600 border border-gray-400`}
+				className={`flex-grow grid grid-cols-6 md:grid-cols-10 gap-2 bg-opacity-50 rounded-md  p-2 min-h-[5rem] backdrop-blur-md bg-gray-600 border border-gray-400`}
 			>
 				<SortableContext items={imageIds} strategy={rectSortingStrategy}>
 					{imageIds.map(id => (

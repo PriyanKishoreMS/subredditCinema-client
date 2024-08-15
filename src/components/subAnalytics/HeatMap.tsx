@@ -46,17 +46,17 @@ const Heatmap: React.FC<{
 	});
 
 	const getColor = (value: number) => {
-		if (value > 9) return "bg-green-950";
+		if (value > 9) return "bg-transparent";
 		const colorMap = {
-			1: "bg-green-100",
-			2: "bg-green-200",
-			3: "bg-green-300",
-			4: "bg-green-400",
-			5: "bg-green-500",
-			6: "bg-green-600",
-			7: "bg-green-700",
-			8: "bg-green-800",
-			9: "bg-green-900",
+			1: "bg-lime-900/50 shadow-none",
+			2: "bg-lime-800/90 shadow-none",
+			3: "bg-lime-700/95 shadow-none",
+			4: "bg-lime-600 shadow-none",
+			5: "bg-lime-500 shadow-none",
+			6: "bg-lime-400 shadow-none",
+			7: "bg-lime-300 shadow-none",
+			8: "bg-lime-200 shadow-md",
+			9: "bg-lime-100 shadow-xl",
 		};
 		return colorMap[value as keyof typeof colorMap] || "bg-green-0";
 	};
@@ -124,11 +124,11 @@ const Heatmap: React.FC<{
 									>
 										<HoverCardTrigger>
 											<div
-												className={`w-7 h-7 mr-2 mb-2 rounded-sm ${getColor(value)} border border-gray-600 flex items-center justify-center ${value > 9 && "border-orange-500"}`}
+												className={`w-7 h-7 mr-2 mb-2 rounded-sm ${getColor(value)} border ${value <= 9 && value != 0 && "shadow-lime-200 border-green-900/70"} ${value == 0 && "border border-gray-700"} flex items-center justify-center ${value > 9 && "border-orange-500 shadow-xl shadow-orange-400"}`}
 											>
 												{value >= 10 && (
 													<span
-														className={`text-xs ${value % 10 < 5 ? "font-bold text-orange-300" : "font-black text-orange-600"}`}
+														className={`text-xs ${value % 10 < 5 ? "font-bold text-orange-300 shadow-xl shadow-orange-500" : "font-black text-orange-600 shadow-xl shadow-orange-500"}`}
 													>
 														{value}
 													</span>
@@ -153,7 +153,7 @@ const Heatmap: React.FC<{
 
 	return (
 		<div className='flex justify-center'>
-			<Card className='bg-gray-900/30 backdrop-blur-md p-5 w-full lg:max-w-5xl border-gray-700 shadow-lg'>
+			<Card className='bg-slate-900/50 backdrop-blur-md p-5 w-full lg:max-w-5xl border-gray-700 shadow-lg'>
 				<CardTitle className='text-xl font-bold text-white'>
 					<span className='flex items-center'>
 						<FaRedditAlien

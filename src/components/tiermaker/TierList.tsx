@@ -16,39 +16,33 @@ import {
 } from "@dnd-kit/sortable";
 import React, { useEffect, useState } from "react";
 
+import { useToJpeg } from "@hugocxl/react-to-image";
 import { v4 as uuidv4 } from "uuid";
+import { Button } from "../ui/button";
 import { DraggableImage } from "./DraggableImage";
 import { InitRow } from "./InitRow";
 import { TierRow } from "./TierRow";
+import { Image, Tier } from "./types";
 
-export interface Image {
-	id: string;
-	src: string;
-	name: string;
-	tier: string;
-}
-
-interface TierListProps {
+export interface TierListProps {
 	initialImages: Image[];
+	title: string;
+	setTitle: React.Dispatch<React.SetStateAction<string>>;
+	tiers: Tier[];
+	setTiers: React.Dispatch<React.SetStateAction<Tier[]>>;
+	images: Record<string, Image>;
+	setImages: React.Dispatch<React.SetStateAction<Record<string, Image>>>;
 }
 
-export interface Tier {
-	id: string;
-	name: string;
-	color: string;
-}
-
-const initialTiers: Tier[] = [
-	{ id: "S", name: "S", color: "bg-green-600" },
-	{ id: "A", name: "A", color: "bg-yellow-300" },
-	{ id: "B", name: "B", color: "bg-yellow-500" },
-	{ id: "C", name: "C", color: "bg-blue-400" },
-	{ id: "D", name: "D", color: "bg-red-600" },
-];
-
-export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
-	const [title, setTitle] = useState<string>("Bollytics Tier List");
-	const [tiers, setTiers] = useState<Tier[]>(initialTiers);
+export const TierList: React.FC<TierListProps> = ({
+	initialImages,
+	title,
+	setTitle,
+	tiers,
+	setTiers,
+	images,
+	setImages,
+}) => {
 	const [items, setItems] = useState<Image[]>([]);
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [tierState, setTierState] = useState<Record<string, string[]>>(() => {
@@ -58,8 +52,6 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 		});
 		return initial;
 	});
-
-	const [images, setImages] = useState<Record<string, Image>>({});
 
 	// const [images] = useState<Record<string, Image>>(() =>
 	// 	initialImages.reduce((acc, img) => {
@@ -173,9 +165,15 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 	};
 
 	const handleTierNameChange = (tierId: string, newName: string) => {
-		setTiers(prev =>
-			prev.map(tier => (tier.id === tierId ? { ...tier, name: newName } : tier))
-		);
+		setTiers(prev => {
+			const updatedTiers = prev.map(tier => {
+				if (tier.id === tierId) {
+					return { ...tier, name: newName };
+				}
+				return tier;
+			});
+			return updatedTiers;
+		});
 	};
 
 	const addTier = () => {
@@ -186,7 +184,6 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 			name: newId,
 			color: "bg-gray-400",
 		};
-		console.log(newId, "id");
 		setTiers(prev => [...prev, newTier]);
 		setTierState(prev => ({ ...prev, [newId]: [] }));
 	};
@@ -223,54 +220,73 @@ export const TierList: React.FC<TierListProps> = ({ initialImages }) => {
 		);
 	};
 
+	const [state, convertToJpeg, ref] = useToJpeg({
+		onSuccess: (data: any) => {
+			// create a background canvas
+			const link = document.createElement("a");
+			link.download = "tiermaker.png";
+			link.href = data;
+			link.click();
+		},
+	});
+
 	return (
-		<DndContext
-			sensors={sensors}
-			onDragEnd={handleDragEnd}
-			onDragOver={handleDragOver}
-			onDragStart={handleDragStart}
-		>
-			<SortableContext
-				items={Object.values(tierState).flat()}
-				strategy={rectSortingStrategy}
+		<div>
+			<DndContext
+				sensors={sensors}
+				onDragEnd={handleDragEnd}
+				onDragOver={handleDragOver}
+				onDragStart={handleDragStart}
 			>
-				<div className='max-w-4xl w-full mx-auto'>
-					<input
-						type='text'
-						value={title}
-						onChange={e => setTitle(e.target.value)}
-						className='text-3xl font-bold text-center my-8 w-full bg-transparent border-none'
-					/>
-					{tiers.map(tier => (
-						<TierRow
-							key={tier.id}
-							tier={tier}
-							imageIds={tierState[tier.id] || []}
+				<SortableContext
+					items={Object.values(tierState).flat()}
+					strategy={rectSortingStrategy}
+				>
+					<div className='max-w-4xl w-full mx-auto'>
+						<div ref={ref}>
+							<input
+								type='text'
+								value={title}
+								onChange={e => setTitle(e.target.value)}
+								className='text-3xl font-bold text-center my-8 w-full bg-transparent border-none'
+							/>
+							{tiers.map(tier => (
+								<TierRow
+									key={tier.id}
+									tier={tier}
+									imageIds={tierState[tier.id] || []}
+									images={images}
+									changeTierColor={newColor =>
+										changeTierColor(tier.id, newColor)
+									}
+									onTierNameChange={handleTierNameChange}
+									onRemoveTier={tierId => removeTier(tierId)}
+								/>
+							))}
+						</div>
+						<InitRow
+							tier='start'
+							imageIds={tierState["start"]}
 							images={images}
-							changeTierColor={newColor => changeTierColor(tier.id, newColor)}
-							onTierNameChange={(oldId, newName) =>
-								handleTierNameChange(oldId, newName)
-							}
-							onRemoveTier={tierId => removeTier(tierId)}
 						/>
-					))}
-					<InitRow tier='start' imageIds={tierState["start"]} images={images} />
-					<div className='flex justify-center mt-4'>
-						<button
-							onClick={addTier}
-							className='px-8 py-2  text-white text font-bold bg-blue-600 rounded-md shadow-lg shadow-blue-900 disabled:opacity-50'
-							disabled={tiers.length >= 9}
-						>
-							Add Tier
-						</button>
+						<div className='flex justify-center mt-4'>
+							<button
+								onClick={addTier}
+								className='px-8 py-2  text-white text font-bold bg-blue-600 rounded-md shadow-lg shadow-blue-900 disabled:opacity-50'
+								disabled={tiers.length >= 9}
+							>
+								Add Tier
+							</button>
+						</div>
 					</div>
-				</div>
-				<DragOverlay>
-					{activeId && images[activeId] && (
-						<DraggableImage image={images[activeId]} />
-					)}
-				</DragOverlay>
-			</SortableContext>
-		</DndContext>
+					<DragOverlay>
+						{activeId && images[activeId] && (
+							<DraggableImage image={images[activeId]} />
+						)}
+					</DragOverlay>
+				</SortableContext>
+			</DndContext>
+			<Button onClick={convertToJpeg}>Download as Image</Button>
+		</div>
 	);
 };
