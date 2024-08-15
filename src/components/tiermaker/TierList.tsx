@@ -53,6 +53,8 @@ export const TierList: React.FC<TierListProps> = ({
 		return initial;
 	});
 
+	console.log(tiers, "tiers in tierlist");
+
 	// const [images] = useState<Record<string, Image>>(() =>
 	// 	initialImages.reduce((acc, img) => {
 	// 		acc[img.id] = img;

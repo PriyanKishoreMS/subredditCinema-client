@@ -38,6 +38,7 @@ export const useApi = () => {
 
 	const fetchWithoutToken = async (url: string, options: RequestInit = {}) => {
 		const headers = new Headers(options.headers);
+		headers.set("Content-Type", "application/json");
 		const response = await fetch(`${BASE_URL}${url}`, { ...options, headers });
 
 		return response;
