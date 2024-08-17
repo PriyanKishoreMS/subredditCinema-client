@@ -2,6 +2,7 @@ export interface Survey {
 	id: number;
 	username: string;
 	avatar: string;
+	reddit_uid: string;
 	subreddit: string;
 	title: string;
 	description: string;

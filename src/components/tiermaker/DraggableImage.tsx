@@ -37,7 +37,7 @@ export const DraggableImage: React.FC<DraggableImageProps> = ({ image }) => {
 				{...attributes}
 				src={"http://localhost:3000/proxy/" + image.src}
 				alt={`Tier ${image.tier} image`}
-				className='w-16 h-16 rounded-lg object-cover cursor-move'
+				className='w-16 h-16 rounded-sm object-cover cursor-move'
 			/>
 			{/* <p className=''>{image.name}</p> */}
 		</div>

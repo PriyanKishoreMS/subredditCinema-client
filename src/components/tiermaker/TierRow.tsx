@@ -17,6 +17,8 @@ interface TierRowProps {
 	images: Record<string, Image>;
 	onTierNameChange: (oldId: string, newName: string) => void;
 	onRemoveTier: (id: string) => void;
+	renderControls: boolean;
+	excludeDivRef?: React.RefObject<HTMLDivElement>;
 }
 
 const colors = [
@@ -38,16 +40,23 @@ export const TierRow: React.FC<TierRowProps> = ({
 	onTierNameChange,
 	changeTierColor,
 	onRemoveTier,
+	renderControls,
 }) => {
-	const { setNodeRef } = useDroppable({
+	const { setNodeRef, node } = useDroppable({
 		id: tier.id,
 	});
 	const [showColorPicker, setShowColorPicker] = useState(false);
 	const [localTierName, setLocalTierName] = useState(tier.name);
+	const [height, setHeight] = useState<number | undefined>(20);
+	// const heightRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		setLocalTierName(tier.name);
 	}, [tier.name]);
+
+	useEffect(() => {
+		setHeight(node.current?.clientHeight);
+	}, [node.current?.clientHeight]);
 
 	const handleColorChange = (color: string) => {
 		changeTierColor(color);
@@ -63,7 +72,8 @@ export const TierRow: React.FC<TierRowProps> = ({
 	return (
 		<div className='flex mb-2 items-center justify-center'>
 			<div
-				className={`flex-shrink-0 lg:w-20 h-20  w-10 mr-2 rounded-md ${tier.color} relative`}
+				className={`flex-shrink-0  w-20 mr-2 rounded-md ${tier.color} relative`}
+				style={{ height: height }}
 			>
 				<span
 					role='textbox'
@@ -78,7 +88,7 @@ export const TierRow: React.FC<TierRowProps> = ({
 			</div>
 			<div
 				ref={setNodeRef}
-				className={`flex-grow grid grid-cols-6 md:grid-cols-10 gap-2 bg-opacity-50 rounded-md  p-2 min-h-[5rem] backdrop-blur-md bg-gray-600 border border-gray-400`}
+				className={`flex-grow grid ${renderControls ? "md:grid-cols-10" : "md:grid-cols-12"} grid-cols-4 gap-2 bg-opacity-50 rounded-md p-2 min-h-[5rem] min-w-[5rem] backdrop-blur-md bg-gray-600 border border-gray-400`}
 			>
 				<SortableContext items={imageIds} strategy={rectSortingStrategy}>
 					{imageIds.map(id => (
@@ -86,38 +96,42 @@ export const TierRow: React.FC<TierRowProps> = ({
 					))}
 				</SortableContext>
 			</div>
-			<button
-				onClick={() => onRemoveTier(tier.id)}
-				className='mx-2 ml-5 text-center rounded-full  bg-opacity-50 '
-			>
-				<FaDeleteLeft className='text-white text-xl text-center' />
-			</button>
-			<div className='relative flex'>
-				<button onClick={() => setShowColorPicker(!showColorPicker)}>
-					<HiOutlineColorSwatch
-						className={`text-white ml-2 rounded-full p-1.5 ${tier.color} text-4xl`}
-					/>
-				</button>
-				{showColorPicker && (
-					<div className='absolute right-0 mt-2 p-4 w-40 z-10 bg-white bg-opacity-50 backdrop-blur-xl border rounded shadow-lg'>
-						<div className='grid grid-cols-3 gap-2 mb-2'>
-							{colors.map((color, index) => (
-								<button
-									key={index}
-									className={`w-8 h-8 ${color} rounded-full`}
-									onClick={() => handleColorChange(color)}
-								></button>
-							))}
-						</div>
-						<button
-							className='w-full mt-2 py-1 bg-gray-200 text-gray-700 rounded'
-							onClick={() => setShowColorPicker(false)}
-						>
-							Close
+			{renderControls && (
+				<div className='flex md:flex-row flex-col items-center justify-center'>
+					<button
+						onClick={() => onRemoveTier(tier.id)}
+						className='mx-2 ml-5 text-center rounded-full  bg-opacity-50 '
+					>
+						<FaDeleteLeft className='text-white text-xl text-center' />
+					</button>
+					<div className='relative flex'>
+						<button onClick={() => setShowColorPicker(!showColorPicker)}>
+							<HiOutlineColorSwatch
+								className={`text-white ml-2 rounded-full p-1.5 ${tier.color} text-4xl`}
+							/>
 						</button>
+						{showColorPicker && (
+							<div className='absolute right-0 mt-2 p-4 w-40 z-10 bg-white bg-opacity-50 backdrop-blur-xl border rounded shadow-lg'>
+								<div className='grid grid-cols-3 gap-2 mb-2'>
+									{colors.map((color, index) => (
+										<button
+											key={index}
+											className={`w-8 h-8 ${color} rounded-full`}
+											onClick={() => handleColorChange(color)}
+										></button>
+									))}
+								</div>
+								<button
+									className='w-full mt-2 py-1 bg-gray-200 text-gray-700 rounded'
+									onClick={() => setShowColorPicker(false)}
+								>
+									Close
+								</button>
+							</div>
+						)}
 					</div>
-				)}
-			</div>
+				</div>
+			)}
 		</div>
 	);
 };

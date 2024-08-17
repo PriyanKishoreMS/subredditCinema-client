@@ -1,3 +1,4 @@
+import { useApi } from "@/utils";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
@@ -58,10 +59,11 @@ const CreateSurveySheet: React.FC<{
 	);
 
 	const queryClient = useQueryClient();
+	const { fetchWithToken } = useApi();
 
 	const createSurveyMutation = useMutation({
 		mutationFn: async (data: SurveyData) => {
-			const response = await fetch(`${ipAddrPort}/api/survey/create`, {
+			const response = await fetchWithToken(`/api/survey/create`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

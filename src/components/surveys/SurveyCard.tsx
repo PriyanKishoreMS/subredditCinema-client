@@ -1,10 +1,21 @@
+import DeleteSheet from "@/components/DeleteSheet";
+import { Survey } from "@/components/surveys/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatFutureTime, formatPastTime } from "@/utils";
+import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import { formatFutureTime, formatPastTime, useApi } from "@/utils";
 import { CalendarIcon } from "@radix-ui/react-icons";
-import React from "react";
-import { Survey } from "./types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useState } from "react";
+import { MdDeleteForever } from "react-icons/md";
 
 interface SurveyCardProps {
 	survey: Survey;
@@ -17,6 +28,37 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey }) => {
 
 	const endTimeValue = formatFutureTime(survey.end_time);
 	const fallbackAvatar = "./public/fallbacksnoovatar.png";
+	const [showDeleteSheet, setShowDeleteSheet] = useState(false);
+	const { user } = useAuth();
+	const { fetchWithToken } = useApi();
+	const queryClient = useQueryClient();
+
+	const deleteSurveyMutation = useMutation({
+		mutationFn: async () => {
+			const response = await fetchWithToken(`/api/survey/delete/${survey.id}`, {
+				method: "DELETE",
+			});
+			if (!response.ok) {
+				throw new Error("Failed to delete survey");
+			}
+			const res = response.json();
+			return res;
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["surveys"] });
+			alert("Survey deleted successfully");
+		},
+		onError: error => {
+			console.error(error);
+			alert("Failed to delete survey");
+		},
+	});
+
+	const handleDeleteSurvey = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setShowDeleteSheet(true);
+	};
 
 	return (
 		<Card className='group hover:shadow-lg transition-all duration-300 bg-gray-900/70 backdrop-blur-md border-gray-700 overflow-hidden cursor-pointer hover:scale-[1.03]'>
@@ -41,10 +83,21 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey }) => {
 							</Badge>
 						</div>
 					</div>
-					<div>
-						<h1 className='mt-2 ml-2 text-gray-400 text-xs'>
+					<div className='flex flex-col items-end justify-center space-y-1'>
+						{user?.id && user.id === survey.reddit_uid && (
+							<Button
+								type='button'
+								variant='destructive'
+								size='sm'
+								className='gap-2'
+								onClick={handleDeleteSurvey}
+							>
+								<MdDeleteForever className='w-4 h-4' /> Delete
+							</Button>
+						)}
+						<CardDescription>
 							#Response: {survey.total_responses}
-						</h1>
+						</CardDescription>
 					</div>
 				</div>
 			</CardHeader>
@@ -66,6 +119,12 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey }) => {
 					{/* {survey.total_responses} */}
 				</div>
 			</CardContent>
+			{showDeleteSheet && (
+				<DeleteSheet
+					setShowDeleteSheet={setShowDeleteSheet}
+					deletePollMutation={deleteSurveyMutation}
+				/>
+			)}
 		</Card>
 	);
 };

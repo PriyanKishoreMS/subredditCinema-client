@@ -1,4 +1,7 @@
+import DeleteSheet from "@/components/DeleteSheet";
+import { Poll } from "@/components/polls/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -7,12 +10,16 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { formatFutureTime, formatPastTime } from "@/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { formatFutureTime, formatPastTime, useApi } from "@/utils";
 import { CalendarIcon } from "@radix-ui/react-icons";
-import { UseMutateAsyncFunction } from "@tanstack/react-query";
+import {
+	UseMutateAsyncFunction,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
 import React from "react";
-
-import { Poll } from "./types";
+import { MdDeleteForever } from "react-icons/md";
 
 const PollCard: React.FC<{
 	poll: Poll;
@@ -36,6 +43,31 @@ const PollCard: React.FC<{
 
 	const endTimeValue = formatFutureTime(poll.end_time);
 	const fallbackAvatar = "./public/fallbacksnoovatar.png";
+	const [showDeleteSheet, setShowDeleteSheet] = React.useState(false);
+	const { user } = useAuth();
+	const { fetchWithToken } = useApi();
+	const queryClient = useQueryClient();
+
+	const deletePollMutation = useMutation({
+		mutationFn: async () => {
+			const response = await fetchWithToken(`/api/poll/delete/${poll.id}`, {
+				method: "DELETE",
+			});
+			if (!response.ok) {
+				throw new Error("Failed to delete poll");
+			}
+			const res = response.json();
+			return res;
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["polls"] });
+			alert("Poll deleted successfully");
+		},
+		onError: error => {
+			console.error(error);
+			alert("Failed to delete poll");
+		},
+	});
 
 	return (
 		<Card
@@ -56,9 +88,19 @@ const PollCard: React.FC<{
 						<p className='text-sm text-gray-500'>r/{poll.subreddit}</p>
 					</div>
 				</div>
-
-				<div className='mt-4 text-sm text-gray-500'>
-					#Response: {totalVotes}
+				<div className='flex flex-col items-end justify-center space-y-1'>
+					{user?.id && user.id === poll.reddit_uid && (
+						<Button
+							type='button'
+							variant='destructive'
+							size='sm'
+							className='gap-2'
+							onClick={() => setShowDeleteSheet(true)}
+						>
+							<MdDeleteForever className='w-4 h-4' /> Delete
+						</Button>
+					)}
+					<CardDescription>#Response: {totalVotes}</CardDescription>
 				</div>
 			</CardHeader>
 			<CardContent className='p-4'>
@@ -118,6 +160,12 @@ const PollCard: React.FC<{
 					</div>
 				</div>
 			</CardContent>
+			{showDeleteSheet && (
+				<DeleteSheet
+					setShowDeleteSheet={setShowDeleteSheet}
+					deletePollMutation={deletePollMutation}
+				/>
+			)}
 		</Card>
 	);
 };

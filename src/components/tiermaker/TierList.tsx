@@ -14,24 +14,23 @@ import {
 	rectSortingStrategy,
 	SortableContext,
 } from "@dnd-kit/sortable";
+import { useToPng } from "@hugocxl/react-to-image";
 import React, { useEffect, useState } from "react";
-
-import { useToJpeg } from "@hugocxl/react-to-image";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "../ui/button";
 import { DraggableImage } from "./DraggableImage";
 import { InitRow } from "./InitRow";
 import { TierRow } from "./TierRow";
-import { Image, Tier } from "./types";
+import { Image as CImage, Tier } from "./types";
 
 export interface TierListProps {
-	initialImages: Image[];
+	initialImages: CImage[];
 	title: string;
 	setTitle: React.Dispatch<React.SetStateAction<string>>;
 	tiers: Tier[];
 	setTiers: React.Dispatch<React.SetStateAction<Tier[]>>;
-	images: Record<string, Image>;
-	setImages: React.Dispatch<React.SetStateAction<Record<string, Image>>>;
+	images: Record<string, CImage>;
+	setImages: React.Dispatch<React.SetStateAction<Record<string, CImage>>>;
 }
 
 export const TierList: React.FC<TierListProps> = ({
@@ -43,7 +42,7 @@ export const TierList: React.FC<TierListProps> = ({
 	images,
 	setImages,
 }) => {
-	const [items, setItems] = useState<Image[]>([]);
+	const [items, setItems] = useState<CImage[]>([]);
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [tierState, setTierState] = useState<Record<string, string[]>>(() => {
 		const initial: Record<string, string[]> = { start: [] };
@@ -52,8 +51,6 @@ export const TierList: React.FC<TierListProps> = ({
 		});
 		return initial;
 	});
-
-	console.log(tiers, "tiers in tierlist");
 
 	// const [images] = useState<Record<string, Image>>(() =>
 	// 	initialImages.reduce((acc, img) => {
@@ -68,7 +65,7 @@ export const TierList: React.FC<TierListProps> = ({
 				acc[img.id] = img;
 				return acc;
 			},
-			{} as Record<string, Image>
+			{} as Record<string, CImage>
 		);
 
 		setImages(prevImages => ({ ...prevImages, ...newImages }));
@@ -222,13 +219,61 @@ export const TierList: React.FC<TierListProps> = ({
 		);
 	};
 
-	const [state, convertToJpeg, ref] = useToJpeg({
-		onSuccess: (data: any) => {
-			// create a background canvas
+	const [renderControls, setRenderControls] = useState(true);
+	const excludeDivRef = React.useRef<HTMLDivElement>(null);
+
+	const [triggerConvert, setTriggerConvert] = useState(false);
+
+	useEffect(() => {
+		if (!renderControls && triggerConvert) {
+			convertToPng();
+			setTriggerConvert(false);
+		}
+	}, [renderControls, triggerConvert]);
+
+	const handleConvert = () => {
+		setRenderControls(false);
+		setTriggerConvert(true);
+	};
+
+	const [state, convertToPng, ref] = useToPng({
+		onSuccess: async (data: string) => {
+			const canvas = document.createElement("canvas");
+			const ctx = canvas.getContext("2d");
+
+			if (!ctx) {
+				console.error("Unable to get 2D context");
+				return;
+			}
+
+			const bgImage = new Image();
+			const htmlImage = new Image();
+
+			bgImage.src = "/twbg2.jpg";
+			htmlImage.src = data;
+
+			await Promise.all([
+				new Promise<void>(resolve => (bgImage.onload = () => resolve())),
+				new Promise<void>(resolve => (htmlImage.onload = () => resolve())),
+			]);
+
+			canvas.width = htmlImage.width;
+			canvas.height = htmlImage.height;
+
+			ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+
+			ctx.globalAlpha = 1;
+			ctx.drawImage(htmlImage, 0, 0);
+			ctx.globalAlpha = 1.0;
+
+			const finalImage = canvas.toDataURL("image/jpeg");
+
 			const link = document.createElement("a");
-			link.download = "tiermaker.png";
-			link.href = data;
+			link.download = "tiermaker.jpg";
+			link.href = finalImage;
 			link.click();
+
+			setRenderControls(true);
 		},
 	});
 
@@ -263,6 +308,8 @@ export const TierList: React.FC<TierListProps> = ({
 									}
 									onTierNameChange={handleTierNameChange}
 									onRemoveTier={tierId => removeTier(tierId)}
+									renderControls={renderControls}
+									excludeDivRef={excludeDivRef}
 								/>
 							))}
 						</div>
@@ -288,7 +335,7 @@ export const TierList: React.FC<TierListProps> = ({
 					</DragOverlay>
 				</SortableContext>
 			</DndContext>
-			<Button onClick={convertToJpeg}>Download as Image</Button>
+			<Button onClick={handleConvert}>Download as Image</Button>
 		</div>
 	);
 };

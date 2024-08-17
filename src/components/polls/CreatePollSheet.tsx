@@ -1,3 +1,4 @@
+import { useApi } from "@/utils";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
@@ -21,23 +22,7 @@ type PollData = {
 	end_time: string;
 };
 
-const ipAddrPort = "http://localhost:3000";
-
 const subreddits = ["kollywood", "tollywood", "bollywood", "MalayalamMovies"];
-
-const PostNewPoll = async (data: PollData) => {
-	const response = await fetch(`${ipAddrPort}/api/poll/create`, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(data),
-	});
-	if (!response.ok) {
-		throw new Error("Failed to create poll");
-	}
-	return response.json();
-};
 
 const CreatePollSheet: React.FC<{
 	isOpen: boolean;
@@ -61,6 +46,22 @@ const CreatePollSheet: React.FC<{
 	);
 
 	const queryClient = useQueryClient();
+
+	const { fetchWithToken } = useApi();
+
+	const PostNewPoll = async (data: PollData) => {
+		const response = await fetchWithToken(`/api/poll/create`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data),
+		});
+		if (!response.ok) {
+			throw new Error("Failed to create poll");
+		}
+		return response.json();
+	};
 
 	const createPollMutation = useMutation({
 		mutationFn: async (data: PollData) => PostNewPoll(data),
