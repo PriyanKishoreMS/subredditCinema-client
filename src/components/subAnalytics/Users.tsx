@@ -1,5 +1,6 @@
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BASE_URL as ipAddrPort } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { Skeleton } from "../ui/skeleton";
@@ -9,8 +10,6 @@ type UserProps = {
 	type: "top" | "controversial";
 	icon: React.ReactNode;
 };
-
-const ipAddrPort = "http://localhost:3000";
 
 const fetchUsers = async (sub: string, type: string, interval: string) => {
 	try {

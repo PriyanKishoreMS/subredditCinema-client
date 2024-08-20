@@ -1,9 +1,13 @@
 import { useAuth } from "../contexts/AuthContext";
 
-const BASE_URL = "http://localhost:3000";
+const prod = true;
+
+export const BASE_URL = prod
+	? "https://subredditcinema-api.priyankishore.dev"
+	: "http://localhost:3000";
 
 export const useApi = () => {
-	const { accessToken, refreshToken, logout } = useAuth();
+	const { accessToken, refreshToken, logout, reloadTokens } = useAuth();
 
 	const fetchWithToken = async (url: string, options: RequestInit = {}) => {
 		if (!accessToken) {
@@ -24,6 +28,8 @@ export const useApi = () => {
 			if (refreshResponse.ok) {
 				const { accessToken: newAccessToken } = await refreshResponse.json();
 				console.log("Token refreshed successfully");
+				console.log("newAccessToken", newAccessToken);
+				reloadTokens();
 				localStorage.setItem("accessToken", newAccessToken);
 				headers.set("Authorization", `Bearer ${newAccessToken}`);
 				return fetch(`${BASE_URL}${url}`, { ...options, headers });

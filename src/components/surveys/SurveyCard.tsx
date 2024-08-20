@@ -27,7 +27,7 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey }) => {
 	);
 
 	const endTimeValue = formatFutureTime(survey.end_time);
-	const fallbackAvatar = "./public/fallbacksnoovatar.png";
+	const fallbackAvatar = "./fallbacksnoovatar.png";
 	const [showDeleteSheet, setShowDeleteSheet] = useState(false);
 	const { user } = useAuth();
 	const { fetchWithToken } = useApi();
@@ -61,7 +61,7 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey }) => {
 	};
 
 	return (
-		<Card className='group hover:shadow-lg transition-all duration-300 bg-gray-900/70 backdrop-blur-md border-gray-700 overflow-hidden cursor-pointer hover:scale-[1.03]'>
+		<Card className='group hover:shadow-lg transition-all duration-100 bg-gray-900/75 backdrop-blur-md border-gray-700 overflow-hidden cursor-pointer hover:bg-gray-900/50'>
 			{/* <div className='absolute inset-0 bg-gradient-to-b from-blue-600/20 to-purple-600/20 opacity-0 group-hover:opacity-30 transition-opacity duration-300' /> */}
 			<CardHeader className='relative'>
 				<div className='flex justify-between items-center'>

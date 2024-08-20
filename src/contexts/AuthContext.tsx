@@ -1,3 +1,4 @@
+import { BASE_URL } from "@/utils/api";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextType {
@@ -14,6 +15,7 @@ interface AuthContextType {
 	) => void;
 	logout: () => void;
 	handleLogin: () => void;
+	reloadTokens: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -43,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	) => {
 		setAccessToken(tokens.accessToken);
 		setRefreshToken(tokens.refreshToken);
-		userData.avatar = userData.avatar || "./public/fallbacksnoovatar.png";
+		userData.avatar = userData.avatar || "./fallbacksnoovatar.png";
 		setUser(userData);
 		localStorage.setItem("username", userData.username);
 		localStorage.setItem("avatar", userData.avatar);
@@ -64,12 +66,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	};
 
 	const handleLogin = () => {
-		const popup = window.open("http://localhost:3000/login", "Reddit Login");
+		const popup = window.open(`${BASE_URL}/login`, "Reddit Login");
 
 		window.addEventListener(
 			"message",
 			event => {
-				if (event.origin !== "http://localhost:3000") return;
+				if (event.origin !== BASE_URL) return;
 
 				if (event.data.type === "AUTH_SUCCESS" && popup != null) {
 					console.log(event.data.tokens);
@@ -85,6 +87,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 			},
 			false
 		);
+	};
+
+	const reloadTokens = () => {
+		const accessToken = localStorage.getItem("accessToken");
+		const refreshToken = localStorage.getItem("refreshToken");
+		setAccessToken(accessToken);
+		setRefreshToken(refreshToken);
 	};
 
 	useEffect(() => {
@@ -103,7 +112,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
 	return (
 		<AuthContext.Provider
-			value={{ accessToken, refreshToken, user, login, logout, handleLogin }}
+			value={{
+				accessToken,
+				refreshToken,
+				user,
+				login,
+				logout,
+				handleLogin,
+				reloadTokens,
+			}}
 		>
 			{children}
 		</AuthContext.Provider>

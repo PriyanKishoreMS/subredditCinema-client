@@ -36,8 +36,6 @@ type SurveyData = {
 	end_time: string;
 };
 
-const ipAddrPort = "http://localhost:3000";
-
 const subreddits = ["kollywood", "tollywood", "bollywood", "MalayalamMovies"];
 const questionTypes = ["text", "single", "multiple"];
 

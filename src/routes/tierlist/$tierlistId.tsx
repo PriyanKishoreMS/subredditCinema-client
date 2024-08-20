@@ -2,12 +2,11 @@ import Search from "@/components/tiermaker/Search";
 import { TierList } from "@/components/tiermaker/TierList";
 import { Image, Tier, TierlistResponse } from "@/components/tiermaker/types";
 import { useApi } from "@/utils";
+import { BASE_URL as ipAddrPort } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-
-const ipAddrPort = "http://localhost:3000";
 
 export const Route = createFileRoute("/tierlist/$tierlistId")({
 	component: TierListPage,

@@ -3,11 +3,10 @@ import { TierList } from "@/components/tiermaker/TierList";
 import { Image, Tier, tierListData } from "@/components/tiermaker/types";
 import { Button } from "@/components/ui/button";
 import { useApi } from "@/utils";
+import { BASE_URL as ipAddrPort } from "@/utils/api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-
-const ipAddrPort = "http://localhost:3000";
 
 // test link https://image.tmdb.org/t/p/w300//p2W0wdiy7QyZ6mtFCVLIPUFCBfD.jpg
 

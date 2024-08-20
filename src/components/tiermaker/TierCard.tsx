@@ -15,10 +15,10 @@ const TierCard: React.FC<TierListCardProps> = ({ tierlist }) => {
 		tierlist.created_at
 	);
 
-	const fallbackAvatar = "./public/fallbacksnoovatar.png";
+	const fallbackAvatar = "./fallbacksnoovatar.png";
 
 	return (
-		<Card className='group hover:shadow-lg transition-all duration-100 bg-gray-900/70 backdrop-blur-md border-gray-700 overflow-hidden cursor-pointer hover:opacity-70'>
+		<Card className='group hover:shadow-lg transition-all duration-100 bg-gray-900/75 backdrop-blur-md border-gray-700 overflow-hidden cursor-pointer hover:opacity-70'>
 			<CardHeader className='relative'>
 				<div className='flex justify-between items-center'>
 					<div className='flex items-center space-x-4'>

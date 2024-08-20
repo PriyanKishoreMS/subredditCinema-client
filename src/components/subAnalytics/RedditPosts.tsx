@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BASE_URL } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { BiSolidUpvote } from "react-icons/bi";
@@ -27,7 +28,7 @@ const fetchPosts = async (
 ) => {
 	console.log(category, "category");
 	const response = await fetch(
-		`http://localhost:3000/api/reddit/${subreddit}/${category}/posts?interval=${interval}`
+		`${BASE_URL}/api/reddit/${subreddit}/${category}/posts?interval=${interval}`
 	);
 	if (!response.ok) {
 		throw new Error("Network response was not ok");

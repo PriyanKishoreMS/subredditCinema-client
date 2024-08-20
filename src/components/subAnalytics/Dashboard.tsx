@@ -4,13 +4,12 @@ import Heatmap from "@/components/subAnalytics/HeatMap";
 import RedditPosts from "@/components/subAnalytics/RedditPosts";
 import Users from "@/components/subAnalytics/Users";
 import { useAuth } from "@/contexts/AuthContext";
+import { BASE_URL as ipAddrPort } from "@/utils/api";
 import { useState } from "react";
 import { BiSolidUpvote } from "react-icons/bi";
 import { LuSword } from "react-icons/lu";
 import Image from "../Image";
 import SubNavbar from "../navbar/SubNavbar";
-
-const ipAddrPort = "http://localhost:3000";
 
 const Dashboard = () => {
 	const [sub, setSub] = useState("kollywood");

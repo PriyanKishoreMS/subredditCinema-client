@@ -5,6 +5,7 @@ import {
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BASE_URL as ipAddrPort } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 import { FaRedditAlien } from "react-icons/fa";
 import { TbEggFilled } from "react-icons/tb";
@@ -12,8 +13,6 @@ import { TbEggFilled } from "react-icons/tb";
 interface FrequencyData {
 	[key: string]: number[];
 }
-
-const ipAddrPort = "http://localhost:3000";
 
 const fetchPostFrequency = async (category: string) => {
 	try {

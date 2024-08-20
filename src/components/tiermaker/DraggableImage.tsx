@@ -1,5 +1,6 @@
 // DraggableImage.tsx
 import { Image } from "@/components/tiermaker/types";
+import { BASE_URL } from "@/utils/api";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import React from "react";
@@ -35,7 +36,7 @@ export const DraggableImage: React.FC<DraggableImageProps> = ({ image }) => {
 				style={style}
 				{...listeners}
 				{...attributes}
-				src={"http://localhost:3000/proxy/" + image.src}
+				src={`${BASE_URL}/proxy/` + image.src}
 				alt={`Tier ${image.tier} image`}
 				className='w-16 h-16 rounded-sm object-cover cursor-move'
 			/>

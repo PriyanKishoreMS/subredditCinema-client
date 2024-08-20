@@ -19,6 +19,7 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import React from "react";
+import { IoMdCheckmarkCircle } from "react-icons/io";
 import { MdDeleteForever } from "react-icons/md";
 
 const PollCard: React.FC<{
@@ -42,7 +43,7 @@ const PollCard: React.FC<{
 	);
 
 	const endTimeValue = formatFutureTime(poll.end_time);
-	const fallbackAvatar = "./public/fallbacksnoovatar.png";
+	const fallbackAvatar = "./fallbacksnoovatar.png";
 	const [showDeleteSheet, setShowDeleteSheet] = React.useState(false);
 	const { user } = useAuth();
 	const { fetchWithToken } = useApi();
@@ -72,7 +73,7 @@ const PollCard: React.FC<{
 	return (
 		<Card
 			key={poll.id}
-			className='bg-gray-900/70 backdrop-blur-md p-5 w-full border-gray-700 shadow-lg'
+			className='bg-gray-900/75 backdrop-blur-md p-5 w-full border-gray-700 shadow-lg'
 		>
 			<CardHeader className='rounded-xl flex flex-row justify-between items-center'>
 				<div className='flex items-center space-x-4'>
@@ -116,7 +117,7 @@ const PollCard: React.FC<{
 					return (
 						<div key={option.id} className='mb-5'>
 							<button
-								className={`relative w-full h-10 hover:bg-slate-700 hover:rounded-md cursor-pointer ${poll.user_vote === option.id && "border-green-500 border rounded-lg p-0.5"}`}
+								className={`relative w-full h-10 hover:bg-slate-700 hover:rounded-md cursor-pointer`}
 								onClick={
 									signedIn
 										? poll.user_vote !== option.id
@@ -132,9 +133,12 @@ const PollCard: React.FC<{
 								<Progress value={progressValue} className='h-full rounded-md' />
 								<div className='absolute inset-0 flex items-center justify-between'>
 									<span
-										className={`text-sm font-medium p-3 ${isLightBackgroundText ? "text-black" : "text-white"}`}
+										className={`text-sm font-medium p-3 ${isLightBackgroundText ? "text-black" : "text-white"} flex gap-2`}
 									>
 										{option.text}
+										{poll.user_vote === option.id && (
+											<IoMdCheckmarkCircle className='w-5 h-5 text-green-600' />
+										)}
 									</span>
 									<span
 										className={`text-sm font-medium p-3 ${isLightBackgroundNum ? "text-black" : "text-white"}`}
