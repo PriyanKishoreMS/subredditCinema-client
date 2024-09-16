@@ -66,27 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	};
 
 	const handleLogin = () => {
-		const popup = window.open(`${BASE_URL}/login`, "Reddit Login");
-
-		window.addEventListener(
-			"message",
-			event => {
-				if (event.origin !== BASE_URL) return;
-
-				if (event.data.type === "AUTH_SUCCESS" && popup != null) {
-					console.log(event.data.tokens);
-					const { accessToken, refreshToken } = event.data.tokens;
-					const {
-						Username: username,
-						RedditUID: id,
-						Avatar: avatar,
-					} = event.data.tokens.user;
-					login({ accessToken, refreshToken }, { username, id, avatar });
-					popup.close();
-				}
-			},
-			false
-		);
+		window.location.href = `${BASE_URL}/login`;
 	};
 
 	const reloadTokens = () => {

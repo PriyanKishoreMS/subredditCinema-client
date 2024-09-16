@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
 	DndContext,
 	DragEndEvent,
@@ -16,8 +17,9 @@ import {
 } from "@dnd-kit/sortable";
 import { useToPng } from "@hugocxl/react-to-image";
 import React, { useEffect, useState } from "react";
+import { FaDownload } from "react-icons/fa";
+import { RxCardStackPlus } from "react-icons/rx";
 import { v4 as uuidv4 } from "uuid";
-import { Button } from "../ui/button";
 import { DraggableImage } from "./DraggableImage";
 import { InitRow } from "./InitRow";
 import { TierRow } from "./TierRow";
@@ -269,7 +271,7 @@ export const TierList: React.FC<TierListProps> = ({
 			const finalImage = canvas.toDataURL("image/jpeg");
 
 			const link = document.createElement("a");
-			link.download = "tiermaker.jpg";
+			link.download = title + " subredditcinema.priyankishore.dev.jpg";
 			link.href = finalImage;
 			link.click();
 
@@ -313,21 +315,29 @@ export const TierList: React.FC<TierListProps> = ({
 								/>
 							))}
 						</div>
-						<InitRow
-							tier='start'
-							imageIds={tierState["start"]}
-							images={images}
-						/>
-						<div className='flex justify-center mt-4'>
-							<button
+						<div className='flex items-center justify-between mt-4'>
+							<Button
 								onClick={addTier}
-								className='px-8 py-2  text-white text font-bold bg-blue-600 rounded-md shadow-lg shadow-blue-900 disabled:opacity-50'
+								className='px-8 py-2 flex flex-row items-center justify-center gap-3  text-white text font-bold bg-blue-600 rounded-md disabled:opacity-50'
 								disabled={tiers.length >= 9}
 							>
+								<RxCardStackPlus className='text-2xl' />
 								Add Tier
-							</button>
+							</Button>
+							<Button className='px-8 py-2 gap-3' onClick={handleConvert}>
+								<FaDownload className='text-lg' />
+								Download as Image
+							</Button>
+						</div>
+						<div className='flex lg:flex-row flex-col w-full'>
+							<InitRow
+								tier='start'
+								imageIds={tierState["start"]}
+								images={images}
+							/>
 						</div>
 					</div>
+
 					<DragOverlay>
 						{activeId && images[activeId] && (
 							<DraggableImage image={images[activeId]} />
@@ -335,7 +345,6 @@ export const TierList: React.FC<TierListProps> = ({
 					</DragOverlay>
 				</SortableContext>
 			</DndContext>
-			<Button onClick={handleConvert}>Download as Image</Button>
 		</div>
 	);
 };

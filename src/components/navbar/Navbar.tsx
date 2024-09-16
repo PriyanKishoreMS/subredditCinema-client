@@ -1,6 +1,6 @@
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { FaRedditAlien } from "react-icons/fa";
 import { PiFilmSlateFill } from "react-icons/pi";
@@ -133,8 +133,8 @@ interface NavItemProps {
 }
 
 const NavLink: React.FC<NavItemProps> = ({ to, text }) => {
-	const router = useRouter();
-	const isActive = router.state.location.pathname === to;
+	const location = useLocation();
+	const isActive = location.pathname === to;
 
 	return (
 		<Link
@@ -151,8 +151,8 @@ const NavLink: React.FC<NavItemProps> = ({ to, text }) => {
 };
 
 const MobileNavItem: React.FC<NavItemProps> = ({ to, text, onClick }) => {
-	const router = useRouter();
-	const isActive = router.state.location.pathname === to;
+	const location = useLocation();
+	const isActive = location.pathname === to;
 
 	return (
 		<Link

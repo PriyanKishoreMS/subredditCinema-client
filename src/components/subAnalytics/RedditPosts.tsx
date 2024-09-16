@@ -130,6 +130,18 @@ const RedditPosts: React.FC<RedditPostsProps> = ({ subreddit, category }) => {
 									<PostsSkeleton key={index} state='Error' />
 								))}
 							</div>
+						) : data.posts.length === 0 ? (
+							<div className='flex lg:flex-row flex-col items-center justify-center gap-3'>
+								{Array.from({ length: 5 }).map((_, index) => (
+									<div key={index} className='flex flex-col'>
+										<Skeleton className='flex flex-col items-start p-5 lg:w-48 lg:h-64 w-80 h-36 shadow-lg animate-none'>
+											<h1 className='text-xl text-gray-500'>
+												{"No " + interval + "ly post found"}
+											</h1>
+										</Skeleton>
+									</div>
+								))}
+							</div>
 						) : (
 							<div className='flex items-center justify-center'>
 								<div className='flex lg:flex-row flex-col items-center mt-1 justify-center gap-3'>

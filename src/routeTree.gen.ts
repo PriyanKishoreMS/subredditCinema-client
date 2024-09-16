@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as PollsImport } from './routes/polls'
+import { Route as AuthCallbackImport } from './routes/auth-callback'
 import { Route as IndexImport } from './routes/index'
 import { Route as TierlistIndexImport } from './routes/tierlist/index'
 import { Route as SurveysIndexImport } from './routes/surveys/index'
@@ -23,6 +24,11 @@ import { Route as SurveysSurveyIdImport } from './routes/surveys/$surveyId'
 
 const PollsRoute = PollsImport.update({
   path: '/polls',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthCallbackRoute = AuthCallbackImport.update({
+  path: '/auth-callback',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -65,6 +71,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/auth-callback': {
+      id: '/auth-callback'
+      path: '/auth-callback'
+      fullPath: '/auth-callback'
+      preLoaderRoute: typeof AuthCallbackImport
       parentRoute: typeof rootRoute
     }
     '/polls': {
@@ -116,6 +129,7 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
+  AuthCallbackRoute,
   PollsRoute,
   SurveysSurveyIdRoute,
   TierlistTierlistIdRoute,
@@ -133,6 +147,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/auth-callback",
         "/polls",
         "/surveys/$surveyId",
         "/tierlist/$tierlistId",
@@ -143,6 +158,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/auth-callback": {
+      "filePath": "auth-callback.tsx"
     },
     "/polls": {
       "filePath": "polls.tsx"

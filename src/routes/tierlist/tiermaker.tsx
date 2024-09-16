@@ -149,24 +149,6 @@ function TierMaker() {
 			<div className='container mx-auto p-4 sm:p-8'>
 				<div className='flex flex-col lg:flex-row gap-8'>
 					<div className='w-full'>
-						<div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
-							{subreddits.map(sub => (
-								<label
-									key={sub}
-									className='flex items-center space-x-2 cursor-pointer'
-								>
-									<input
-										type='radio'
-										name='subreddit'
-										value={sub}
-										checked={category === sub}
-										onChange={handleInputChange}
-										className='form-radio text-blue-500'
-									/>
-									<span>{sub}</span>
-								</label>
-							))}
-						</div>
 						<TierList
 							initialImages={tierImages}
 							images={images}
@@ -176,6 +158,47 @@ function TierMaker() {
 							title={title}
 							setTitle={setTitle}
 						/>
+						<div className='flex flex-col items-center justify-center mt-5'>
+							<div className='flex flex-col items-center justify-center bg-slate-700 bg-opacity-80 backdrop-blur-md rounded-xl px-8 pt-8 pb-4 max-w-5xl w-11/12 pr-12'>
+								<div className='flex flex-col items-center justify-between w-full'>
+									<div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
+										{subreddits.map(sub => (
+											<label
+												key={sub}
+												className='flex items-center space-x-2 cursor-pointer'
+											>
+												<input
+													type='radio'
+													name='subreddit'
+													value={sub}
+													checked={category === sub}
+													onChange={handleInputChange}
+													className='form-radio text-blue-500'
+												/>
+												<span>{sub}</span>
+											</label>
+										))}
+									</div>
+									<Button
+										onClick={handleSubmit}
+										disabled={createTierListMutation.isPending}
+										className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full mt-4'
+									>
+										{createTierListMutation.isPending
+											? "Submitting..."
+											: "Submit Tier List"}
+									</Button>
+									<p className='text-slate-400 font-light mt-5'>
+										<span className='bg-orange-500 text-white p-0.5 italic'>
+											NOTE:
+										</span>
+										{"  "}
+										Select a subreddit to post your tier list to. You can only
+										select one subreddit.
+									</p>
+								</div>
+							</div>
+						</div>
 					</div>
 					<div>
 						<Search
@@ -187,15 +210,6 @@ function TierMaker() {
 						/>
 					</div>
 				</div>
-				<Button
-					onClick={handleSubmit}
-					disabled={createTierListMutation.isPending}
-					className='mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
-				>
-					{createTierListMutation.isPending
-						? "Submitting..."
-						: "Submit Tier List"}
-				</Button>
 			</div>
 		</div>
 	);
