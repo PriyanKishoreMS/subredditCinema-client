@@ -78,11 +78,6 @@ const Navbar: React.FC<{
 										text='Surveys'
 										onClick={closeSideSheet}
 									/>
-									<MobileNavItem
-										to='/memerepo'
-										text='Meme Repo'
-										onClick={closeSideSheet}
-									/>
 								</div>
 								{user ? (
 									<Button

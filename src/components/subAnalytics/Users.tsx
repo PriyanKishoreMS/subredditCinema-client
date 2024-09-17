@@ -77,19 +77,24 @@ const Users: React.FC<UserProps> = ({ sub, type, icon }) => {
 						<UsersSkeleton state='Error' />
 					) : (
 						<ul>
-							{data.users.map((user: { user: string; post_count: number }) => (
-								<li key={user.user} className='text-white font-medium text-lg'>
-									<span className='text-orange-500'>u/</span>
-									<a
-										href={`https://www.reddit.com/user/${user.user}/submitted`}
-										target='_blank'
-										rel='noreferrer'
-										className='hover:text-sky-500 transition-colors duration-100'
+							{data?.users?.map(
+								(user: { user: string; post_count: number }) => (
+									<li
+										key={user.user}
+										className='text-white font-medium text-lg'
 									>
-										{user.user} - {user.post_count} posts
-									</a>
-								</li>
-							))}
+										<span className='text-orange-500'>u/</span>
+										<a
+											href={`https://www.reddit.com/user/${user.user}/submitted`}
+											target='_blank'
+											rel='noreferrer'
+											className='hover:text-sky-500 transition-colors duration-100'
+										>
+											{user.user} - {user.post_count} posts
+										</a>
+									</li>
+								)
+							)}
 						</ul>
 					)}
 				</Card>

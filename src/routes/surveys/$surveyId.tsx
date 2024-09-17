@@ -32,6 +32,7 @@ function SurveyPage() {
 	const { user } = useAuth();
 	const [signedIn, setSignedIn] = useState(user !== null);
 	const [isLogSheetOpen, setIsLogSheetOpen] = useState(false);
+	const currentTime = new Date().toISOString();
 
 	useEffect(() => {
 		setSignedIn(user !== null);
@@ -155,13 +156,18 @@ function SurveyPage() {
 					<div className='items-center justify-center flex gap-3'>
 						<Button
 							variant='secondary'
-							disabled={!signedIn || !survey?.is_responded}
+							disabled={
+								!signedIn ||
+								(currentTime < survey?.end_time && !survey?.is_responded)
+							}
 							onClick={() => setShowResults(!showResults)}
 						>
 							{signedIn ? (
 								<>
 									{survey?.is_responded ? (
 										<>{showResults ? "Hide Results" : "Show Results"} </>
+									) : currentTime > survey?.end_time ? (
+										"Show Results"
 									) : (
 										"Participate to see results"
 									)}
@@ -319,7 +325,11 @@ function SurveyPage() {
 					{!showResults && (
 						<Button
 							onClick={signedIn ? handleSubmit : () => setIsLogSheetOpen(true)}
-							disabled={submitMutation.isPending || survey?.is_responded}
+							disabled={
+								submitMutation.isPending ||
+								survey?.is_responded ||
+								currentTime > survey.end_time
+							}
 						>
 							{!signedIn ? (
 								"Verify to participate in the survey"
@@ -331,7 +341,9 @@ function SurveyPage() {
 										<>
 											{survey?.is_responded
 												? "Already submitted"
-												: "Submit Survey"}
+												: currentTime > survey?.end_time
+													? "Survey Over"
+													: "Submit Survey"}
 										</>
 									)}
 								</>
