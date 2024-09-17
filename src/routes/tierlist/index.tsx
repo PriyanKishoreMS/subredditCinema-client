@@ -4,6 +4,7 @@ import SubNavbar from "@/components/navbar/SubNavbar";
 import TierCard from "@/components/tiermaker/TierCard";
 import { TierListsResponse } from "@/components/tiermaker/types";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useApi } from "@/utils";
 import { PlusIcon } from "@radix-ui/react-icons";
@@ -24,7 +25,10 @@ function Tierlist() {
 	const { user } = useAuth();
 	const { fetchWithoutToken } = useApi();
 
-	const { data, error } = useQuery<TierListsResponse, Error>({
+	const { data, error, isError, isLoading } = useQuery<
+		TierListsResponse,
+		Error
+	>({
 		queryKey: ["tierlists", sub, page],
 		queryFn: async () => {
 			const response = await fetchWithoutToken(
@@ -49,6 +53,25 @@ function Tierlist() {
 	const tierlists = data?.tier_lists || [];
 	console.log(tierlists, "tierlists");
 
+	const TierListSkeleton: React.FC<{ state: string }> = ({ state }) => {
+		return (
+			<div className='flex flex-col'>
+				<Skeleton className='flex flex-col items-start p-5 w-full h-[400px] shadow-lg'>
+					<div className='flex justify-start w-full space-x-5 items-center'>
+						<Skeleton className='w-11 h-10 rounded-full' />
+						<div className='flex flex-col w-full gap-3'>
+							<Skeleton className='w-full h-5 rounded-xl' />
+							<Skeleton className='w-3/4 h-5 rounded-xl' />
+						</div>
+					</div>
+					<Skeleton className='h-full p-5 mt-5  w-full '>
+						<h1 className='text-xl text-gray-500'>{state}</h1>
+					</Skeleton>
+				</Skeleton>
+			</div>
+		);
+	};
+
 	return (
 		<>
 			<div className='min-h-screen'>
@@ -66,6 +89,11 @@ function Tierlist() {
 						<div className='h-3/4 flex justify-between flex-col'>
 							<div className='flex flex-col items-center justify-center lg:flex-row lg:justify-center mb-5'>
 								<div className='w-full lg:max-w-7xl grid md:grid-cols-3 sm:grid-cols-2 gap-10'>
+									{isLoading &&
+										Array.from({ length: 6 }).map((_, i) => (
+											<TierListSkeleton key={i} state='Loading...' />
+										))}{" "}
+									{isError && <TierListSkeleton state={"Error..."} />}
 									{tierlists.map(tierlist => (
 										<Link
 											key={tierlist.id}
