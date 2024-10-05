@@ -2,6 +2,7 @@ import Search from "@/components/tiermaker/Search";
 import { TierList } from "@/components/tiermaker/TierList";
 import { Image, Tier, tierListData } from "@/components/tiermaker/types";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import { useApi } from "@/utils";
 import { BASE_URL as ipAddrPort } from "@/utils/api";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -48,6 +49,7 @@ function TierMaker() {
 	});
 
 	const [tierImages, setTierImages] = useState<Image[]>([]);
+	const { user } = useAuth();
 
 	const { data: searchResults, refetch } = useQuery({
 		queryKey: ["tierImages", tierImageQuery],
@@ -181,12 +183,14 @@ function TierMaker() {
 									</div>
 									<Button
 										onClick={handleSubmit}
-										disabled={createTierListMutation.isPending}
+										disabled={createTierListMutation.isPending || !user}
 										className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full mt-4'
 									>
-										{createTierListMutation.isPending
-											? "Submitting..."
-											: "Submit Tier List"}
+										{!!user
+											? createTierListMutation.isPending
+												? "Submitting..."
+												: "Submit Tier List"
+											: "Verify to Submit"}
 									</Button>
 									<p className='text-slate-400 font-light mt-5'>
 										<span className='bg-orange-500 text-white p-0.5 italic'>

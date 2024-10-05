@@ -271,7 +271,7 @@ export const TierList: React.FC<TierListProps> = ({
 			const finalImage = canvas.toDataURL("image/jpeg");
 
 			const link = document.createElement("a");
-			link.download = title + " subredditcinema.priyankishore.dev.jpg";
+			link.download = title + " subcinema.priyankishore.dev.jpg";
 			link.href = finalImage;
 			link.click();
 

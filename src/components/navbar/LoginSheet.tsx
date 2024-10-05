@@ -27,7 +27,7 @@ const Login: React.FC<{
 							className='flex items-center text-2xl font-bold text-white'
 						>
 							<PiFilmSlateFill className='mr-2 text-orange-500' />
-							<span className='text-orange-500'>SubReddit</span>Cinema
+							<span className='text-orange-500'>Sub</span>Cinema
 						</Link>
 						<Button size='icon' onClick={onClose} variant='ghost'>
 							<Cross1Icon />
