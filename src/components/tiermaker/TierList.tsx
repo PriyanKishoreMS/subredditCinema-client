@@ -33,6 +33,7 @@ export interface TierListProps {
 	setTiers: React.Dispatch<React.SetStateAction<Tier[]>>;
 	images: Record<string, CImage>;
 	setImages: React.Dispatch<React.SetStateAction<Record<string, CImage>>>;
+	setTierImages: React.Dispatch<React.SetStateAction<CImage[]>>;
 }
 
 export const TierList: React.FC<TierListProps> = ({
@@ -43,6 +44,7 @@ export const TierList: React.FC<TierListProps> = ({
 	setTiers,
 	images,
 	setImages,
+	setTierImages,
 }) => {
 	const [items, setItems] = useState<CImage[]>([]);
 	const [activeId, setActiveId] = useState<string | null>(null);
@@ -97,6 +99,17 @@ export const TierList: React.FC<TierListProps> = ({
 			activationConstraint: { distance: 10 },
 		})
 	);
+
+	const handleRemoveImage = (id: string) => {
+		console.log("Removing image", id);
+		setTierImages(prev => prev.filter(img => img.id !== id));
+		setImages(prev => {
+			const newImages = { ...prev };
+			delete newImages[id];
+			return newImages;
+		});
+		console.log("initial images", initialImages);
+	};
 
 	const handleDragEnd = (event: DragEndEvent) => {
 		const { active, over } = event;
@@ -312,6 +325,7 @@ export const TierList: React.FC<TierListProps> = ({
 									onRemoveTier={tierId => removeTier(tierId)}
 									renderControls={renderControls}
 									excludeDivRef={excludeDivRef}
+									handleRemoveImage={handleRemoveImage}
 								/>
 							))}
 						</div>
@@ -334,13 +348,17 @@ export const TierList: React.FC<TierListProps> = ({
 								tier='start'
 								imageIds={tierState["start"]}
 								images={images}
+								handleRemoveImage={handleRemoveImage}
 							/>
 						</div>
 					</div>
 
 					<DragOverlay>
 						{activeId && images[activeId] && (
-							<DraggableImage image={images[activeId]} />
+							<DraggableImage
+								image={images[activeId]}
+								handleRemoveImage={handleRemoveImage}
+							/>
 						)}
 					</DragOverlay>
 				</SortableContext>

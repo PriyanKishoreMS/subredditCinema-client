@@ -1,6 +1,6 @@
 import { useAuth } from "../contexts/AuthContext";
 
-const prod = true;
+const prod = false;
 
 export const BASE_URL = prod
 	? "https://subredditcinema-api.priyankishore.dev"

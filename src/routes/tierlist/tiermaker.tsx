@@ -159,6 +159,7 @@ function TierMaker() {
 							setTiers={setTiers}
 							title={title}
 							setTitle={setTitle}
+							setTierImages={setTierImages}
 						/>
 						<div className='flex flex-col items-center justify-center mt-5'>
 							<div className='flex flex-col items-center justify-center bg-slate-700 bg-opacity-80 backdrop-blur-md rounded-xl px-8 pt-8 pb-4 max-w-5xl w-11/12 pr-12'>

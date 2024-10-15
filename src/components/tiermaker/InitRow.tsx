@@ -8,9 +8,15 @@ interface InitRowProps {
 	tier: string;
 	imageIds: string[];
 	images: Record<string, Image>;
+	handleRemoveImage: (id: string) => void;
 }
 
-export const InitRow: React.FC<InitRowProps> = ({ tier, imageIds, images }) => {
+export const InitRow: React.FC<InitRowProps> = ({
+	tier,
+	imageIds,
+	images,
+	handleRemoveImage,
+}) => {
 	const { setNodeRef } = useDroppable({
 		id: tier,
 	});
@@ -23,7 +29,14 @@ export const InitRow: React.FC<InitRowProps> = ({ tier, imageIds, images }) => {
 			>
 				<SortableContext items={imageIds} strategy={rectSortingStrategy}>
 					{imageIds.length > 0 ? (
-						imageIds.map(id => <DraggableImage key={id} image={images[id]} />)
+						imageIds.map(id => (
+							<DraggableImage
+								tier={tier}
+								key={id}
+								image={images[id]}
+								handleRemoveImage={handleRemoveImage}
+							/>
+						))
 					) : (
 						<div className='col-span-6 md:col-span-11 flex items-center justify-center text-gray-500 italic'>
 							Search and click on items here to start

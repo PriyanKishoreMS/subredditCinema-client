@@ -19,6 +19,7 @@ interface TierRowProps {
 	onRemoveTier: (id: string) => void;
 	renderControls: boolean;
 	excludeDivRef?: React.RefObject<HTMLDivElement>;
+	handleRemoveImage: (id: string) => void;
 }
 
 const colors = [
@@ -41,6 +42,7 @@ export const TierRow: React.FC<TierRowProps> = ({
 	changeTierColor,
 	onRemoveTier,
 	renderControls,
+	handleRemoveImage,
 }) => {
 	const { setNodeRef, node } = useDroppable({
 		id: tier.id,
@@ -92,7 +94,12 @@ export const TierRow: React.FC<TierRowProps> = ({
 			>
 				<SortableContext items={imageIds} strategy={rectSortingStrategy}>
 					{imageIds.map(id => (
-						<DraggableImage key={id} image={images[id]} />
+						<DraggableImage
+							tier={tier.name}
+							key={id}
+							image={images[id]}
+							handleRemoveImage={handleRemoveImage}
+						/>
 					))}
 				</SortableContext>
 			</div>

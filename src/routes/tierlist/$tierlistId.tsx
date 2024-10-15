@@ -142,6 +142,7 @@ function TierListPage() {
 							setTiers={setTiers}
 							title={title}
 							setTitle={setTitle}
+							setTierImages={setTierImages}
 						/>
 					</div>
 					<div>
