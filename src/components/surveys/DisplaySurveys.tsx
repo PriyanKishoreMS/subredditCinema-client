@@ -39,7 +39,7 @@ const DisplaySurveys = () => {
 	const [page, setPage] = useState(1);
 	const [isCreateSurveyOpen, setIsCreateSurveyOpen] = useState(false);
 	const [isLogSheetOpen, setIsLogSheetOpen] = useState(false);
-	const { user } = useAuth();
+	const { user, setQuestionName } = useAuth();
 
 	const [signedIn, setSignedIn] = useState(user !== null);
 

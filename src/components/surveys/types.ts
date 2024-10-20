@@ -50,6 +50,23 @@ export type SurveyResponse = {
 	}>;
 };
 
+export interface TextResponses {
+	metadata: {
+		current_page: number;
+		page_size: number;
+		first_page: number;
+		last_page: number;
+		total_records: number;
+	};
+	responses: TextResponse[];
+}
+
+export type TextResponse = {
+	answer_id: number;
+	answer_text: string;
+	created_at: string;
+};
+
 export type Answer = {
 	question_id: number;
 	selected_option_id?: number;

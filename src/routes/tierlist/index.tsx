@@ -10,7 +10,8 @@ import { useApi } from "@/utils";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import ReactGA from "react-ga4";
 import { FaChevronRight } from "react-icons/fa";
 import { FaChevronLeft } from "react-icons/fa6";
 
@@ -24,6 +25,16 @@ function Tierlist() {
 	const [isLogSheetOpen, setIsLogSheetOpen] = useState(false);
 	const { user } = useAuth();
 	const { fetchWithoutToken } = useApi();
+
+	useEffect(() => {
+		console.log("Hitting the tierlist", window.location.pathname);
+
+		ReactGA.send({
+			hitType: "pageview",
+			page: window.location.pathname,
+			title: "Tierlist",
+		});
+	}, []);
 
 	const { data, error, isError, isLoading } = useQuery<
 		TierListsResponse,

@@ -64,6 +64,8 @@ function SurveyPage() {
 		}
 	};
 
+	console.log(showResults, "showresults");
+
 	const submitMutation = useMutation({
 		mutationFn: async (data: Answer[]) => {
 			const response = await fetchWithToken(
@@ -167,7 +169,7 @@ function SurveyPage() {
 									{survey?.is_responded ? (
 										<>{showResults ? "Hide Results" : "Show Results"} </>
 									) : currentTime > survey?.end_time ? (
-										"Show Results"
+										<>{showResults ? "Hide Results" : "Show Results"} </>
 									) : (
 										"Participate to see results"
 									)}
@@ -204,7 +206,7 @@ function SurveyPage() {
 					</div>
 					<CardDescription className='flex self-end'>
 						<Badge variant='secondary' className='bg-blue-600/40'>
-							{survey.is_responded ? "already responded" : "new"}
+							{survey.is_responded ? "already responded" : "not responded"}
 						</Badge>
 					</CardDescription>
 				</CardHeader>

@@ -1,7 +1,10 @@
 import { QuestionPieChart } from "@/components/surveys/QuestionPieChart";
 import { SurveyResponse } from "@/components/surveys/types";
+import { useAuth } from "@/contexts/AuthContext";
 import { useApi } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { Button } from "../ui/button";
 
 const SurveyResults: React.FC<{
 	surveyID: number;
@@ -23,6 +26,8 @@ const SurveyResults: React.FC<{
 			queryFn: async () => await fetchSurveyResults(surveyId),
 		});
 	};
+
+	const { setQuestionName } = useAuth();
 
 	const {
 		data: surveyResults,
@@ -47,6 +52,22 @@ const SurveyResults: React.FC<{
 						surveyResults.results[question.question_id].response_count
 					}
 				/>
+			)}
+			{question && question?.type === "text" && (
+				<div>
+					<Link
+						key={question.question_id}
+						to={`/surveys/result/${question.question_id}/${surveyID}`}
+						params={{
+							questionId: question.question_id.toString(),
+							surveyId: surveyID.toString(),
+						}}
+					>
+						<Button onClick={() => setQuestionName(question.text)}>
+							See Responses to this Question
+						</Button>
+					</Link>
+				</div>
 			)}
 		</div>
 	);

@@ -14,9 +14,8 @@ function AuthCallback() {
 	const [cookies, _, removeCookie] = useCookies(["tokens"]);
 
 	useEffect(() => {
-		console.log("AuthCallback mounted");
 		const processAuth = async () => {
-			const tokens = cookies.tokens;
+			const tokens = await cookies.tokens;
 			if (!tokens) {
 				console.log("No tokens found in cookies");
 				navigate({ to: "/" });

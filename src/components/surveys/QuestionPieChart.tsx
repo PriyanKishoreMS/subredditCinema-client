@@ -20,7 +20,7 @@ export const QuestionPieChart: React.FC<PieChartProps> = ({
 }) => {
 	return (
 		<Card className='w-full justify-between flex md:flex-row flex-col items-center'>
-			<CardContent>
+			<CardContent className='mt-8 md:mt-0'>
 				<div>
 					{data.map((option, index) => (
 						<div

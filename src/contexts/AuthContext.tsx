@@ -16,6 +16,8 @@ interface AuthContextType {
 	logout: () => void;
 	handleLogin: () => void;
 	reloadTokens: () => void;
+	questionName: string | null;
+	setQuestionName: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -38,6 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 				}
 			: null
 	);
+	const [questionName, setQuestionName] = useState<string | null>(null);
 
 	const login = (
 		tokens: { accessToken: string; refreshToken: string },
@@ -100,6 +103,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 				logout,
 				handleLogin,
 				reloadTokens,
+				questionName,
+				setQuestionName,
 			}}
 		>
 			{children}
